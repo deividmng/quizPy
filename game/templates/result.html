@@ -4,28 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Result</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-    <h1>Game Over!</h1>
-    <p>Your score: {{ score }}</p>
-    <h3>Incorrect Answers:</h3>
-    <ul>
-        {% for incorrect_answer in incorrect_answers %}
-            <li>
-                Question: {{ incorrect_answer.question }} <br>
-                Your answer: {{ incorrect_answer.your_answer }} <br>
-                Correct answer: {{ incorrect_answer.correct_answer }}
-            </li>
-        {% empty %}
-            <li>None! You got all the answers correct!</li>
-        {% endfor %}
-    </ul>
-    
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="text-center">
+            <h1 class="text-danger">Game Over!</h1>
+            <p class="fs-4">Your score: <span class="fw-bold text-primary">{{ score }} of 10</span></p>
+        </div>
+        
+        <div class="mt-4">
+            <h3 class="text-secondary">Incorrect Answers:</h3>
+            <ul class="list-group">
+                {% for incorrect_answer in incorrect_answers %}
+                    <li class="list-group-item">
+                        <strong>Question:</strong> {{ incorrect_answer.question }} <br>
+                        <strong>Your answer:</strong> {{ incorrect_answer.your_answer }} <br>
+                        <!-- <strong>Correct answer:</strong> {{ incorrect_answer.correct_answer }} -->
+                    </li>
+                {% empty %}
+                    <li class="list-group-item text-success">None! You got all the answers correct!</li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+        <!-- Formulario para reiniciar el puntaje -->
+        <div class="mt-5 text-center">
+            <form method="POST" action="{% url 'reset_score' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary btn-lg">Try Again</button>
+            </form>
+        </div>
+    </div>
 
-    <!-- Formulario para reiniciar el puntaje -->
-    <form method="POST" action="{% url 'reset_score' %}">
-        {% csrf_token %}
-        <button type="submit">Try Again</button>
-    </form>
+    <!-- Bootstrap JS and Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
