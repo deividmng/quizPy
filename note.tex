@@ -1,0 +1,20 @@
+#pip install virtualenv
+#py -m venv venv
+#.\venv\Scripts\Activate
+#pip install django
+#django-admin startproject quiz_game . = el punto es para que lo cree en la raiz de la app
+#python manage.py runserver
+#python manage.py startapp game
+
+-- Crea en el folder que creaste un archivo urls.py i dentro crea las rutas globales 
+
+from django.urls import path
+from . import views
+urlpatterns = [
+    path('', views.hello),# el  '' esta vacio para que sea la primera vista 
+    path('about/', views.about),# el  '' esta vacio para que sea la primera vista 
+]
+
+#python manage.py migrate
+
+-- para ver las tables usa db broser 
