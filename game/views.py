@@ -4,15 +4,12 @@ from django.shortcuts import render,redirect
 from .models import Project
 import random
 
-# Create your views here.
-def index(request):
- return render(request,'project_list.html')
-
 def hello(request):
     # Obtener todas las preguntas ordenadas por 'id'
     projects = Project.objects.all().order_by('id')
     selected_answer = None
     is_correct = None
+    error_message = None  # Variable para el mensaje de error
     current_question_index = int(request.POST.get('current_question_index', 0))
 
     # Inicializar la sesión
@@ -27,10 +24,12 @@ def hello(request):
         selected_answer = request.POST.get(f'answer_{project.id}')
 
         if selected_answer:
+            # Verificar si la respuesta es correcta
             is_correct = (selected_answer == project.correct_answer)
             if is_correct:
                 request.session['score'] += 1
             else:
+                # Respuesta incorrecta
                 incorrect_answer = {
                     'question': project.question,
                     'your_answer': selected_answer,
@@ -40,9 +39,22 @@ def hello(request):
                 incorrect_answers.append(incorrect_answer)
                 request.session['incorrect_answers'] = incorrect_answers
                 request.session.modified = True
+        else:
+            # Manejar el caso donde no se seleccionó una respuesta
+            error_message = "You must select an answer."
+            incorrect_answer = {
+                'question': project.question,
+                'your_answer': "No answer selected",
+                'correct_answer': project.correct_answer,
+            }
+            incorrect_answers = request.session['incorrect_answers']
+            incorrect_answers.append(incorrect_answer)
+            request.session['incorrect_answers'] = incorrect_answers
+            request.session.modified = True
 
         current_question_index += 1
 
+    # Verificar si el índice actual supera el total de preguntas
     if current_question_index >= len(projects):
         return render(request, 'result.html', {
             'score': request.session['score'],
@@ -55,6 +67,7 @@ def hello(request):
         'selected_answer': selected_answer,
         'is_correct': is_correct,
         'current_question_index': current_question_index,
+        'error_message': error_message,  # Pasar el mensaje de error al template
     })
 
 # Esta función restablecerá el puntaje y las respuestas incorrectas
