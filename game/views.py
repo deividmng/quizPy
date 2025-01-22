@@ -1,36 +1,71 @@
 # from django.shortcuts import render
-from django.http import HttpResponse
-from django.shortcuts import render
+from django.http import HttpResponse ,JsonResponse
+from django.shortcuts import render,redirect
 from .models import Project
-
+import random
 
 # Create your views here.
+def index(request):
+ return render(request,'project_list.html')
+
 def hello(request):
- return HttpResponse('<h1>david</h1>')
+    # Obtener todas las preguntas ordenadas por 'id'
+    projects = Project.objects.all().order_by('id')
+    selected_answer = None
+    is_correct = None
+    current_question_index = int(request.POST.get('current_question_index', 0))
+
+    # Inicializar la sesión
+    if 'score' not in request.session:
+        request.session['score'] = 0
+    if 'incorrect_answers' not in request.session:
+        request.session['incorrect_answers'] = []
+
+    if request.method == "POST":
+        question_id = request.POST.get('question_id')
+        project = Project.objects.get(id=question_id)
+        selected_answer = request.POST.get(f'answer_{project.id}')
+
+        if selected_answer:
+            is_correct = (selected_answer == project.correct_answer)
+            if is_correct:
+                request.session['score'] += 1
+            else:
+                incorrect_answer = {
+                    'question': project.question,
+                    'your_answer': selected_answer,
+                    'correct_answer': project.correct_answer,
+                }
+                incorrect_answers = request.session['incorrect_answers']
+                incorrect_answers.append(incorrect_answer)
+                request.session['incorrect_answers'] = incorrect_answers
+                request.session.modified = True
+
+        current_question_index += 1
+
+    if current_question_index >= len(projects):
+        return render(request, 'result.html', {
+            'score': request.session['score'],
+            'incorrect_answers': request.session['incorrect_answers']
+        })
+
+    current_project = projects[current_question_index]
+    return render(request, 'project_list.html', {
+        'project': current_project,
+        'selected_answer': selected_answer,
+        'is_correct': is_correct,
+        'current_question_index': current_question_index,
+    })
+
+# Esta función restablecerá el puntaje y las respuestas incorrectas
+def reset_score(request):
+    # Aquí restablecemos el puntaje y las respuestas incorrectas a sus valores iniciales.
+    request.session['score'] = 0
+    request.session['incorrect_answers'] = []
+
+    return redirect('hello')  # Redirigimos a la página principal del juego (hello)
 
 
 def about(request):
     return HttpResponse('<h1>about</h1>')
 
-from django.shortcuts import render
-from .models import Project
-
-def project_list(request):
-    # Recupera todos los registros de la tabla Project
-    projects = Project.objects.all()
-    selected_answer = None
-    is_correct = None
-
-    if request.method == "POST":
-        question_id = request.POST.get('question_id')  # ID de la pregunta seleccionada
-        selected_answer = request.POST.get('answer')  # Respuesta seleccionada
-        project = Project.objects.get(id=question_id)  # Obtiene la pregunta de la BD
-
-        # Verifica si la respuesta seleccionada es correcta
-        is_correct = (selected_answer == project.correct_answer)
-
-    return render(request, 'project_list.html', {
-        'projects': projects,
-        'selected_answer': selected_answer,
-        'is_correct': is_correct
-    })

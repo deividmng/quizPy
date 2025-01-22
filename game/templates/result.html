@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Result</title>
+</head>
+<body>
+    <h1>Game Over!</h1>
+    <p>Your score: {{ score }}</p>
+    <h3>Incorrect Answers:</h3>
+    <ul>
+        {% for incorrect_answer in incorrect_answers %}
+            <li>
+                Question: {{ incorrect_answer.question }} <br>
+                Your answer: {{ incorrect_answer.your_answer }} <br>
+                Correct answer: {{ incorrect_answer.correct_answer }}
+            </li>
+        {% empty %}
+            <li>None! You got all the answers correct!</li>
+        {% endfor %}
+    </ul>
+    
+
+    <!-- Formulario para reiniciar el puntaje -->
+    <form method="POST" action="{% url 'reset_score' %}">
+        {% csrf_token %}
+        <button type="submit">Try Again</button>
+    </form>
+</body>
+</html>
