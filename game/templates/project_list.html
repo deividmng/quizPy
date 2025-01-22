@@ -6,60 +6,35 @@
     <title>Project List</title>
 </head>
 <body>
-    <h1>Answer the Questions</h1>
+    <h1>Questions from the Database (Ordered by ID)</h1>
+    <strong>Question ID: {{ project.id }}</strong> - {{ project.question }}
     <form method="POST">
         {% csrf_token %}
-        <table border="1">
-            <thead>
-                <tr>
-                    <th>Question</th>
-                    <th>Choices</th>
-                    <th>Submit Answer</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for project in projects %}
-                <tr>
-                    <td>{{ project.question }}</td>
-                    <td>
-                        <label>
-                            <input type="radio" name="answer" value="{{ project.choice_1 }}">
-                            {{ project.choice_1 }}
-                        </label><br>
-                        <label>
-                            <input type="radio" name="answer" value="{{ project.choice_2 }}">
-                            {{ project.choice_2 }}
-                        </label><br>
-                        <label>
-                            <input type="radio" name="answer" value="{{ project.choice_3 }}">
-                            {{ project.choice_3 }}
-                        </label><br>
-                        <label>
-                            <input type="radio" name="answer" value="{{ project.choice_4 }}">
-                            {{ project.choice_4 }}
-                        </label>
-                    </td>
-                    <td>
-                        <input type="hidden" name="question_id" value="{{ project.id }}">
-                        <button type="submit">Submit</button>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="3">No projects available.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+     
+        <input type="hidden" name="question_id" value="{{ project.id }}">
+        <input type="hidden" name="current_question_index" value="{{ current_question_index }}">
+        
+        <!-- Opciones de respuesta con un nombre único para cada pregunta -->
+        <label>
+            <input type="radio" name="answer_{{ project.id }}" value="{{ project.choice_1 }}">
+            {{ project.choice_1 }}
+        </label><br>
+        <label>
+            <input type="radio" name="answer_{{ project.id }}" value="{{ project.choice_2 }}">
+            {{ project.choice_2 }}
+        </label><br>
+        <label>
+            <input type="radio" name="answer_{{ project.id }}" value="{{ project.choice_3 }}">
+            {{ project.choice_3 }}
+        </label><br>
+        <label>
+            <input type="radio" name="answer_{{ project.id }}" value="{{ project.choice_4 }}">
+            {{ project.choice_4 }}
+        </label><br>
+
+        <button type="submit">Submit Answer</button>
     </form>
 
-    {% if selected_answer %}
-    <h2>Your Answer: "{{ selected_answer }}"</h2>
-    {% if is_correct %}
-    <p style="color: green;">Correct!</p>
-    {% else %}
-    <p style="color: red;">Wrong! Try Again.</p>
-    {% endif %}
-    {% endif %}
+
 </body>
 </html>
