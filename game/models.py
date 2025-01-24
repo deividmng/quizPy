@@ -1,14 +1,24 @@
-    
 from django.db import models
 from django.core.exceptions import ValidationError
 
 class Project(models.Model):
+    CATEGORY_CHOICES = [
+        ('JavaScript', 'JavaScript'),
+        ('Python', 'Python'),
+    ]
+
     question = models.TextField(null=False)
     choice_1 = models.TextField(blank=True, null=True)
     choice_2 = models.TextField(blank=True, null=True)
     choice_3 = models.TextField(blank=True, null=True)
     choice_4 = models.TextField(blank=True, null=True)
     correct_answer = models.TextField()
+    category = models.CharField(
+        max_length=50,
+        choices=CATEGORY_CHOICES,
+        default='JavaScript',
+        help_text="Select the category for this question."
+    )
 
     def clean(self):
         """
@@ -26,4 +36,4 @@ class Project(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.question
+        return f"[{self.category}] {self.question}"
