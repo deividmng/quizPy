@@ -78,24 +78,75 @@ def reset_score(request):
     # Aquí restablecemos el puntaje y las respuestas incorrectas a sus valores iniciales.
     request.session['score'] = 0
     request.session['incorrect_answers'] = []
+    request.session['python_score'] = 0
+    request.session['python_incorrect_answers'] = []
 
     return redirect('home')  # Redirigimos a la página principal del juego (home)
 
 
 def python_questions(request):
-    # Lógica para obtener las preguntas de Python
-    project = {
-        "id": 1,
-        "question": "What is the output of print(2 ** 3)?",
-        "choice_1": "6",
-        "choice_2": "8",
-        "choice_3": "9",
-        "choice_4": "Error",
-    }
-    current_question_index = 1  # Puedes reemplazar esto según la lógica de tu aplicación.
+    python_projects = Project.objects.filter(category='Python').order_by('id')
+    selected_answer = None
+    is_correct = None
+    error_message = None  # Variable para el mensaje de error
+    current_question_index = int(request.POST.get('current_question_index', 0))
 
+    # Inicializar la sesión
+    if 'python_score' not in request.session:
+        request.session['python_score'] = 0
+    if 'python_incorrect_answers' not in request.session:
+        request.session['python_incorrect_answers'] = []
+
+    if request.method == "POST":
+        question_id = request.POST.get('question_id')
+        project = Project.objects.get(id=question_id)
+        selected_answer = request.POST.get(f'answer_{project.id}')
+
+        if selected_answer:
+            # Verificar si la respuesta es correcta
+            is_correct = (selected_answer == project.correct_answer)
+            if is_correct:
+                request.session['python_score'] += 1
+            else:
+                # Respuesta incorrecta
+                incorrect_answer = {
+                    'question': project.question,
+                    'your_answer': selected_answer,
+                    'correct_answer': project.correct_answer,
+                }
+                incorrect_answers = request.session['python_incorrect_answers']
+                incorrect_answers.append(incorrect_answer)
+                request.session['python_incorrect_answers'] = incorrect_answers
+                request.session.modified = True
+        else:
+            # Manejar el caso donde no se seleccionó una respuesta
+            error_message = "You must select an answer."
+            incorrect_answer = {
+                'question': project.question,
+                'your_answer': "No answer selected",
+                'correct_answer': project.correct_answer,
+            }
+            incorrect_answers = request.session['python_incorrect_answers']
+            incorrect_answers.append(incorrect_answer)
+            request.session['python_incorrect_answers'] = incorrect_answers
+            request.session.modified = True
+
+        current_question_index += 1
+
+    # Verificar si el índice actual supera el total de preguntas
+    if current_question_index >= len(python_projects):
+        return render(request, 'result.html', {
+            'score': request.session['python_score'],
+            'incorrect_answers': request.session['python_incorrect_answers']
+        })
+
+    current_project = python_projects[current_question_index]
     return render(request, 'python_questions.html', {
-        'project': project,
+        'project': current_project,
+        'selected_answer': selected_answer,
+        'is_correct': is_correct,
         'current_question_index': current_question_index,
+        'error_message': error_message,  # Pasar el mensaje de error al template
     })
+
 
