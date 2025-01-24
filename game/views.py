@@ -1,8 +1,7 @@
-# from django.shortcuts import render
 from django.http import HttpResponse ,JsonResponse
 from django.shortcuts import render,redirect
 from .models import Project
-import random
+
 
 def home(request):
     return render(request, 'home.html')
@@ -83,6 +82,20 @@ def reset_score(request):
     return redirect('home')  # Redirigimos a la página principal del juego (home)
 
 
-def python(request):
-    return HttpResponse('<h1>python</h1>')
+def python_questions(request):
+    # Lógica para obtener las preguntas de Python
+    project = {
+        "id": 1,
+        "question": "What is the output of print(2 ** 3)?",
+        "choice_1": "6",
+        "choice_2": "8",
+        "choice_3": "9",
+        "choice_4": "Error",
+    }
+    current_question_index = 1  # Puedes reemplazar esto según la lógica de tu aplicación.
+
+    return render(request, 'python_questions.html', {
+        'project': project,
+        'current_question_index': current_question_index,
+    })
 
