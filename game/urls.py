@@ -9,4 +9,5 @@ urlpatterns = [
     path('sql/', views.sql_questions, name='sql_questions'),  # Cambiado a 'sql/'
     path('question/<int:question_id>/', views.js, name='js_with_id'),
     path('reset_score/', views.reset_score, name='reset_score'),
+    path('try_later/', views.try_later, name='try_later'),
 ]
