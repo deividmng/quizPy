@@ -5,6 +5,7 @@ class Project(models.Model):
     CATEGORY_CHOICES = [
         ('JavaScript', 'JavaScript'),
         ('Python', 'Python'),
+        ('SQL', 'SQL'),  # Nueva categoría para preguntas de SQL
     ]
 
     question = models.TextField(null=False)
