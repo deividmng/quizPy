@@ -4,7 +4,11 @@ from django.shortcuts import render,redirect
 from .models import Project
 import random
 
-def hello(request):
+def home(request):
+    return render(request, 'home.html')
+
+
+def js(request):
     # Obtener todas las preguntas ordenadas por 'id'
     projects = Project.objects.all().order_by('id')
     selected_answer = None
@@ -76,9 +80,9 @@ def reset_score(request):
     request.session['score'] = 0
     request.session['incorrect_answers'] = []
 
-    return redirect('hello')  # Redirigimos a la página principal del juego (hello)
+    return redirect('home')  # Redirigimos a la página principal del juego (home)
 
 
-def about(request):
-    return HttpResponse('<h1>about</h1>')
+def python(request):
+    return HttpResponse('<h1>python</h1>')
 
