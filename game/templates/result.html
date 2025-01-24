@@ -31,11 +31,23 @@
         
         <!-- Formulario para reiniciar el puntaje -->
         <div class="mt-5 text-center">
-            <form method="POST" action="{% url 'reset_score' %}">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-primary btn-lg">Try Again</button>
-            </form>
+            <div class="d-flex justify-content-center gap-3">
+                <!-- Formulario para reiniciar el puntaje -->
+                <form method="POST" action="{% url 'reset_score' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="next_url" value="{{ request.path }}">
+                    <button type="submit" class="btn btn-primary btn-lg">Try Again</button>
+                </form>
+        
+                <!-- Botón Try later que usa un formulario para hacer un POST -->
+                <form method="POST" action="{% url 'try_later' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary btn-lg">Try later</button>
+                </form>
+            </div>
         </div>
+        
+
     </div>
 
     <!-- Bootstrap JS and Popper -->
