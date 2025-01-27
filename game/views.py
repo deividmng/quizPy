@@ -1,11 +1,67 @@
 from django.http import HttpResponse ,JsonResponse
 from django.shortcuts import render,redirect
 from .models import Project
+from django.contrib.auth.forms import UserCreationForm ,AuthenticationForm
+from django.contrib.auth import login ,logout, authenticate
+from django.contrib.auth.models import User
+from django.db import IntegrityError
+
+
+def signup(request):
+    if request.method == 'GET':
+        # Pasamos un formulario vacío a la plantilla
+        form = UserCreationForm()
+        return render(request, 'signup.html', {'form': form})
+    else:
+        # Proceso de creación de usuario y verificación de contraseña
+        form = UserCreationForm(request.POST)  # Reconstruimos el formulario con los datos enviados
+        if request.POST['password1'] == request.POST['password2']:
+            try:
+                user = User.objects.create_user(
+                    username=request.POST['username'],
+                    password=request.POST['password1']
+                )
+                user.save()
+                login(request,user)
+                return redirect('home')
+                # return HttpResponse('User created successfully')
+            except IntegrityError:
+                return render(request, 'signup.html', {
+                    'form': form,
+                    'error': 'User already exists'
+                })
+        else:
+            return render(request, 'signup.html', {
+                'form': form,
+                'error': 'Passwords do not match'
+            })
+ 
+
+
+def signin(request):
+    if request.method == 'GET':
+        return render(request, 'signin.html', {
+            'form': AuthenticationForm
+        })
+    else:
+        user = authenticate(
+            request, 
+            username=request.POST['username'], 
+            password=request.POST['password']
+        )
+        if user is None:
+            return render(request, 'signin.html', {
+                'form': AuthenticationForm,
+                'error': 'Username or password is incorrect'
+            })
+        else:
+            login(request, user)
+            return redirect('home') 
+
 
 
 def home(request):
     return render(request, 'home.html')
-
 
 def js(request):
     # Obtener todas las preguntas ordenadas por 'id'
@@ -74,6 +130,7 @@ def js(request):
     })
 
 # Esta función restablecerá el puntaje y las respuestas incorrectas
+
 def reset_score(request):
     # Reset score and incorrect answers, 
     request.session['score'] = 0
@@ -88,7 +145,8 @@ def reset_score(request):
 
     return redirect(next_url)
 
-
+# try to connect with the resect_score 
+#! it scras with the url that I save <why??
 def try_later(request):
      # Reset score and incorrect answers, 
     request.session['score'] = 0
@@ -142,8 +200,6 @@ def python_questions(request):
         'current_question_index': current_question_index,
         'error_message': error_message,
     })
-
-
 
 
 def sql_questions(request):
