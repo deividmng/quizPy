@@ -11,9 +11,12 @@
     <div class="container mt-5">
         <div class="text-center">
             <h1 class="text-danger">Game Over!</h1>
-            <p class="fs-4">Your score: <span class="fw-bold text-primary">{{ score }} of 10</span></p>
+            <p class="fs-4">Your score: <span class="fw-bold text-primary">{{ score }} of {{ total_selected_answers }}
+                {{ total_selected_python_answers }}
+                {{ total_selected_sql_answers }}
+                {{ total_selected_js_answers }}
+            </span></p>
         </div>
-        
         <div class="mt-4">
             <h3 class="text-secondary">Incorrect Answers:</h3>
             <ul class="list-group">

@@ -12,4 +12,7 @@ urlpatterns = [
     path('try_later/', views.try_later, name='try_later'),
     path('signup/', views.signup, name='signup'),
     path('signin/', views.signin, name='signin'),
+    path('signin/', views.signin, name='signin'),
+    path('flashcard_form/', views.flashcard_form, name='flashcard_form'),
+    path('flashcard_list/', views.flashcard_list, name='flashcard_list'), 
 ]
