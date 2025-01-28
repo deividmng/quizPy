@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg">
+        <div class="card-body">
+            <h2 class="text-center text-primary">Flashcards</h2>
+            <!-- Display the current question -->
+            <p class="fs-5">{{ flashcard.question }}</p>
+            <p>Total de respuestas seleccionadas: {{ total_selected_answers }}</p>
+
+
+            <!-- Form -->
+            <form method="POST" class="mt-4">
+                {% csrf_token %}
+                <input type="hidden" name="question_id" value="{{ flashcard.id }}" />
+                <input
+                    type="hidden"
+                    name="current_question_index"
+                    value="{{ current_question_index }}"
+                />
+
+                <!-- Answer options with Bootstrap styling -->
+                <div class="form-check">
+                    <input
+                        class="form-check-input"
+                        type="radio"
+                        name="answer_{{ flashcard.id }}"
+                        id="choice1"
+                        value="{{ flashcard.choice_1 }}"
+                    />
+                    <label class="form-check-label" for="choice1">
+                        {{ flashcard.choice_1 }}
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input
+                        class="form-check-input"
+                        type="radio"
+                        name="answer_{{ flashcard.id }}"
+                        id="choice2"
+                        value="{{ flashcard.choice_2 }}"
+                    />
+                    <label class="form-check-label" for="choice2">
+                        {{ flashcard.choice_2 }}
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input
+                        class="form-check-input"
+                        type="radio"
+                        name="answer_{{ flashcard.id }}"
+                        id="choice3"
+                        value="{{ flashcard.choice_3 }}"
+                    />
+                    <label class="form-check-label" for="choice3">
+                        {{ flashcard.choice_3 }}
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input
+                        class="form-check-input"
+                        type="radio"
+                        name="answer_{{ flashcard.id }}"
+                        id="choice4"
+                        value="{{ flashcard.choice_4 }}"
+                    />
+                    <label class="form-check-label" for="choice4">
+                        {{ flashcard.choice_4 }}
+                    </label>
+                </div>
+
+                {% if error_message %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error_message }}
+                </div>
+                {% endif %}
+
+                <!-- Submit button -->
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-success btn-lg">
+                        Submit Answer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

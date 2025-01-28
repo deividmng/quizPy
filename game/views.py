@@ -5,6 +5,90 @@ from django.contrib.auth.forms import UserCreationForm ,AuthenticationForm
 from django.contrib.auth import login ,logout, authenticate
 from django.contrib.auth.models import User
 from django.db import IntegrityError
+from .forms import FlashcardForm
+from django.shortcuts import render, redirect
+from django.shortcuts import render, get_object_or_404
+
+def flashcard_form(request):
+    if request.method == 'POST':
+        form = FlashcardForm(request.POST)
+        if form.is_valid():
+            # Guarda el formulario en la base de datos
+            form.save()
+            return redirect('flashcard_list')  # Asegúrate de que esta URL sea correcta
+    else:
+        form = FlashcardForm()
+
+    return render(request, 'flashcard_form.html', {'form': form})
+
+
+def flashcard_list(request):
+    # Obtener todas las preguntas de la categoría 'Flashcard'
+    flashcards = Project.objects.filter(category='Flashcard').order_by('id')
+    # Índice de la pregunta actual
+    current_question_index = int(request.POST.get('current_question_index', 0))
+
+    # Variables iniciales
+    selected_answer = None
+    is_correct = None
+    error_message = None
+
+    # Contar las respuestas seleccionadas
+    total_selected_answers = request.session.get('total_selected_answers', 0)
+
+    if request.method == "POST":
+        # Obtener el ID de la pregunta actual
+        question_id = request.POST.get('question_id')
+        flashcard = get_object_or_404(Project, id=question_id, category='Flashcard')
+
+        # Respuesta seleccionada
+        selected_answer = request.POST.get(f'answer_{flashcard.id}')
+
+        if selected_answer:
+            # Incrementar el contador de respuestas seleccionadas
+            total_selected_answers += 1
+            request.session['total_selected_answers'] = total_selected_answers  # Guardar en la sesión
+
+            # Validar si la respuesta es correcta
+            if selected_answer == flashcard.correct_answer:
+                request.session['flashcard_score'] = request.session.get('flashcard_score', 0) + 1
+                is_correct = True
+            else:
+                # Registrar respuestas incorrectas en la sesión
+                incorrect_answers = request.session.setdefault('flashcard_incorrect_answers', [])
+                incorrect_answers.append({
+                    'question': flashcard.question,
+                    'your_answer': selected_answer,
+                    'correct_answer': flashcard.correct_answer,
+                })
+                request.session.modified = True
+
+            # Avanzar al siguiente índice
+            current_question_index += 1
+        else:
+            # Generar un mensaje de error si no se selecciona ninguna respuesta
+            error_message = "You must select an answer."
+
+    # Si se han terminado las preguntas, redirigir a la página de resultados
+    if current_question_index >= len(flashcards):
+        return render(request, 'result.html', {
+            'score': request.session.get('flashcard_score', 0),
+            'incorrect_answers': request.session.get('flashcard_incorrect_answers', []),
+            'total_selected_answers': total_selected_answers  # Pasar el total de respuestas seleccionadas
+        })
+
+    # Pregunta actual
+    current_flashcard = flashcards[current_question_index]
+
+    return render(request, 'flashcard_list.html', {
+        'flashcard': current_flashcard,
+        'current_question_index': current_question_index,
+        'selected_answer': selected_answer,
+        'is_correct': is_correct,
+        'error_message': error_message,
+        'total_selected_answers': total_selected_answers,  # Pasar el total de respuestas seleccionadas
+    })
+
 
 
 def signup(request):
@@ -76,6 +160,10 @@ def js(request):
         request.session['score'] = 0
     if 'incorrect_answers' not in request.session:
         request.session['incorrect_answers'] = []
+    if 'total_selected_js_answers' not in request.session:
+        request.session['total_selected_js_answers'] = 0  # Inicializar el contador
+
+    total_selected_answers = request.session['total_selected_js_answers']  # Obtener el contador actual
 
     if request.method == "POST":
         question_id = request.POST.get('question_id')
@@ -83,6 +171,10 @@ def js(request):
         selected_answer = request.POST.get(f'answer_{project.id}')
 
         if selected_answer:
+            # Incrementar el contador de respuestas seleccionadas
+            total_selected_answers += 1
+            request.session['total_selected_js_answers'] = total_selected_answers  # Guardar el contador en la sesión
+
             # Verificar si la respuesta es correcta
             is_correct = (selected_answer == project.correct_answer)
             if is_correct:
@@ -117,7 +209,8 @@ def js(request):
     if current_question_index >= len(projects):
         return render(request, 'result.html', {
             'score': request.session['score'],
-            'incorrect_answers': request.session['incorrect_answers']
+            'incorrect_answers': request.session['incorrect_answers'],
+            'total_selected_js_answers': total_selected_answers  # Pasar el total de respuestas seleccionadas
         })
 
     current_project = projects[current_question_index]
@@ -127,6 +220,7 @@ def js(request):
         'is_correct': is_correct,
         'current_question_index': current_question_index,
         'error_message': error_message,  # Pasar el mensaje de error al template
+        'total_selected_js_answers': total_selected_answers,  # Pasar el total de respuestas seleccionadas
     })
 
 # Esta función restablecerá el puntaje y las respuestas incorrectas
@@ -139,7 +233,13 @@ def reset_score(request):
     request.session['python_incorrect_answers'] = []
     request.session['sql_score'] = 0
     request.session['sql_incorrect_answers'] = []
-
+    request.session['flashcard_score'] = 0
+    request.session['flashcard_incorrect_answers'] = []
+    request.session['total_selected_answers'] = 0
+    request.session['total_selected_python_answers'] = 0
+    request.session['total_selected_sql_answers'] = 0
+    request.session['total_selected_js_answers'] = 0
+    
     #Geting the URL to redirect after the game is done 
     next_url = request.POST.get('next_url', 'home')  #, 'home' in case it dont foun it it will send it at home 
 
@@ -165,42 +265,57 @@ def python_questions(request):
     is_correct = None
     error_message = None
 
+    # Contar las respuestas seleccionadas
+    total_selected_answers = request.session.get('total_selected_python_answers', 0)
+
     if request.method == "POST":
         question_id = request.POST.get('question_id')
         project = Project.objects.get(id=question_id)
         selected_answer = request.POST.get(f'answer_{project.id}')
 
-        if selected_answer == project.correct_answer:
-            request.session['python_score'] += 1
-            is_correct = True
+        if selected_answer:
+            # Incrementar el contador de respuestas seleccionadas
+            total_selected_answers += 1
+            request.session['total_selected_python_answers'] = total_selected_answers  # Guardar en la sesión
+
+            # Validar si la respuesta es correcta
+            if selected_answer == project.correct_answer:
+                request.session['python_score'] = request.session.get('python_score', 0) + 1
+                is_correct = True
+            else:
+                error_message = None
+                request.session['python_incorrect_answers'].append({
+                    'question': project.question,
+                    'your_answer': selected_answer or "No answer selected",
+                    'correct_answer': project.correct_answer
+                })
+                request.session.modified = True
+
+            # Avanzar al siguiente índice
+            current_question_index += 1
         else:
-            error_message = "You must select an answer." if not selected_answer else None
-            request.session['python_incorrect_answers'].append({
-                'question': project.question,
-                'your_answer': selected_answer or "No answer selected",
-                'correct_answer': project.correct_answer
-            })
-            request.session.modified = True
+            # Si no se selecciona una respuesta, mostrar un mensaje de error y no avanzar
+            error_message = "You must select an answer."
 
-        current_question_index += 1
-
-    # If the current question exceeds total, return the result page
+    # Si se han terminado las preguntas, redirigir a la página de resultados
     if current_question_index >= len(python_projects):
         return render(request, 'result.html', {
             'score': request.session.get('python_score', 0),
-            'incorrect_answers': request.session.get('python_incorrect_answers', [])
+            'incorrect_answers': request.session.get('python_incorrect_answers', []),
+            'total_selected_python_answers': total_selected_answers  # Pasar el total de respuestas seleccionadas
         })
 
-    # Proceed with the current project
+    # Pregunta actual
     current_project = python_projects[current_question_index]
+
     return render(request, 'python_questions.html', {
         'project': current_project,
         'selected_answer': selected_answer,
         'is_correct': is_correct,
         'current_question_index': current_question_index,
         'error_message': error_message,
+        'total_selected_python_answers': total_selected_answers,  # Pasar el total de respuestas seleccionadas
     })
-
 
 def sql_questions(request):
     sql_projects = Project.objects.filter(category='SQL').order_by('id')
@@ -209,6 +324,8 @@ def sql_questions(request):
     error_message = None  # Variable para el mensaje de error
     current_question_index = int(request.POST.get('current_question_index', 0))
 
+    # Contar las respuestas seleccionadas
+    total_selected_answers = request.session.get('total_selected_sql_answers', 0)
 
     if request.method == "POST":
         question_id = request.POST.get('question_id')
@@ -216,10 +333,14 @@ def sql_questions(request):
         selected_answer = request.POST.get(f'answer_{project.id}')
 
         if selected_answer:
+            # Incrementar el contador de respuestas seleccionadas
+            total_selected_answers += 1
+            request.session['total_selected_sql_answers'] = total_selected_answers  # Guardar en la sesión
+
             # Verificar si la respuesta es correcta
             is_correct = (selected_answer == project.correct_answer)
             if is_correct:
-                request.session['sql_score'] += 1
+                request.session['sql_score'] = request.session.get('sql_score', 0) + 1
             else:
                 # Respuesta incorrecta
                 incorrect_answer = {
@@ -227,10 +348,13 @@ def sql_questions(request):
                     'your_answer': selected_answer,
                     'correct_answer': project.correct_answer,
                 }
-                incorrect_answers = request.session['sql_incorrect_answers']
+                incorrect_answers = request.session.setdefault('sql_incorrect_answers', [])
                 incorrect_answers.append(incorrect_answer)
                 request.session['sql_incorrect_answers'] = incorrect_answers
                 request.session.modified = True
+
+            # Avanzar al siguiente índice
+            current_question_index += 1
         else:
             # Manejar el caso donde no se seleccionó una respuesta
             error_message = "You must select an answer."
@@ -239,18 +363,18 @@ def sql_questions(request):
                 'your_answer': "No answer selected",
                 'correct_answer': project.correct_answer,
             }
-            incorrect_answers = request.session['sql_incorrect_answers']
+            incorrect_answers = request.session.setdefault('sql_incorrect_answers', [])
             incorrect_answers.append(incorrect_answer)
             request.session['sql_incorrect_answers'] = incorrect_answers
             request.session.modified = True
-
-        current_question_index += 1
+            # No avanzar al siguiente índice si no se selecciona respuesta
 
     # Verificar si el índice actual supera el total de preguntas
     if current_question_index >= len(sql_projects):
         return render(request, 'result.html', {
-            'score': request.session['sql_score'],
-            'incorrect_answers': request.session['sql_incorrect_answers']
+            'score': request.session.get('sql_score', 0),
+            'incorrect_answers': request.session.get('sql_incorrect_answers', []),
+            'total_selected_sql_answers': total_selected_answers  # Pasar el total de respuestas seleccionadas
         })
 
     current_project = sql_projects[current_question_index]
@@ -259,7 +383,6 @@ def sql_questions(request):
         'selected_answer': selected_answer,
         'is_correct': is_correct,
         'current_question_index': current_question_index,
-        'error_message': error_message,  
+        'error_message': error_message,
+        'total_selected_sql_answers': total_selected_answers,  # Pasar el total de respuestas seleccionadas
     })
-
-

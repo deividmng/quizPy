@@ -6,6 +6,7 @@ class Project(models.Model):
         ('JavaScript', 'JavaScript'),
         ('Python', 'Python'),
         ('SQL', 'SQL'),  # Nueva categoría para preguntas de SQL
+        ('Flashcard', 'Flashcard'),  # Nueva categoría
     ]
 
     question = models.TextField(null=False)
