@@ -9,6 +9,16 @@
             <p class="fs-5">{{ flashcard.question }}</p>
             <p>Total de respuestas seleccionadas: {{ total_selected_answers }}</p>
 
+            <a href="{% url 'flashcard_details' pk=flashcard.pk %}" class="btn btn-primary">
+                Ver Detalles
+            </a>
+            {% for flashcard in flashcards %}
+    <div class="flashcard">
+        <p>{{ flashcard.question }}</p>
+        <!-- Enlace estilizado como botón para acceder a los detalles -->
+        <a href="{% url 'flashcard_details' pk=flashcard.pk %}" class="btn btn-primary">Ver Detalles</a>
+    </div>
+{% endfor %}
 
             <!-- Form -->
             <form method="POST" class="mt-4">
