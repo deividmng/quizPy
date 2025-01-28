@@ -40,18 +40,23 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/sql/">Sql</a>
                     </li>
+                    {% if user.is_authenticated %}
                     <li class="nav-item">
                         <a class="nav-link" href="/flashcard_form/">Create Flash Card</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/flashcard_list/">Flash List</a>
                     </li>
+                    {% endif %}
                     
                     <li class="nav-item">
                         <a class="nav-link" href="/signup">Signup</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/signin">signin</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-danger" href="/logout">Logout</a>
                     </li>
                 </ul>
             </div>

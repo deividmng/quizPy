@@ -8,7 +8,10 @@ from django.db import IntegrityError
 from .forms import FlashcardForm
 from django.shortcuts import render, redirect
 from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
 
+
+@login_required
 def flashcard_form(request):
     if request.method == 'POST':
         form = FlashcardForm(request.POST)
@@ -21,7 +24,7 @@ def flashcard_form(request):
 
     return render(request, 'flashcard_form.html', {'form': form})
 
-
+@login_required
 def flashcard_list(request):
     # Obtener todas las preguntas de la categoría 'Flashcard'
     flashcards = Project.objects.filter(category='Flashcard').order_by('id')
@@ -142,6 +145,10 @@ def signin(request):
             login(request, user)
             return redirect('home') 
 
+
+def singout(request):
+    logout(request)
+    return redirect('home')
 
 
 def home(request):
@@ -386,3 +393,45 @@ def sql_questions(request):
         'error_message': error_message,
         'total_selected_sql_answers': total_selected_answers,  # Pasar el total de respuestas seleccionadas
     })
+
+
+
+
+#* update and delete 
+
+@login_required
+def flashcard_details(request, pk):
+    flashcard = get_object_or_404(Project, pk=pk, category='Flashcard')  
+    return render(request, 'flashcard_details.html', {'flashcard': flashcard})
+
+
+@login_required
+def update_flashcard(request, pk):
+    flashcard = get_object_or_404(Project, pk=pk)
+
+    if request.method == 'POST':
+        # getting the value from the form
+        flashcard.question = request.POST['question']
+        flashcard.choice_1 = request.POST['choice_1']
+        flashcard.choice_2 = request.POST['choice_2']
+        flashcard.choice_3 = request.POST['choice_3']
+        flashcard.choice_4 = request.POST['choice_4']
+        flashcard.correct_answer = request.POST['correct_answer']
+        
+        # Saving the new date 
+        flashcard.save()
+        
+        # Redirigir a la vista de detalles de la flashcard
+        return redirect('home', pk=flashcard.pk)
+
+    return render(request, 'home', {'flashcard': flashcard})
+
+@login_required
+def delete_flashcard(request, pk):
+    flashcard = get_object_or_404(Project, pk=pk)
+
+    if request.method == "POST":
+        flashcard.delete()
+        return redirect('flashcard_list')  # Redirige a la lista de flashcards después de eliminar
+
+    return render(request, 'delete_flashcard.html', {'flashcard': flashcard})
