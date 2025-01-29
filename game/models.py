@@ -7,6 +7,7 @@ class Project(models.Model):
         ('JavaScript', 'JavaScript'),
         ('Python', 'Python'),
         ('SQL', 'SQL'),
+        ('Git', 'Git'),
         
     ]
 
