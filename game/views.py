@@ -160,7 +160,7 @@ def home(request):
 
 def js(request):
     # Obtener todas las preguntas ordenadas por 'id'
-    projects = Project.objects.all().order_by('id')
+    projects = Project.objects.filter(category='JavaScript').order_by('id')
     selected_answer = None
     is_correct = None
     error_message = None  # Variable para el mensaje de error

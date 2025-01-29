@@ -3,10 +3,11 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 class Project(models.Model):
     CATEGORY_CHOICES = [
+        ('Flashcard', 'Flashcard'),
         ('JavaScript', 'JavaScript'),
         ('Python', 'Python'),
         ('SQL', 'SQL'),
-        ('Flashcard', 'Flashcard'),
+        
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)  # Relación con el modelo User

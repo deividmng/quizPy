@@ -13,5 +13,10 @@ class FlashcardForm(forms.ModelForm):
             'choice_3': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Option 3'}),
             'choice_4': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Option 4'}),
             'correct_answer': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Correct Answer'}),
-            'category': forms.Select(attrs={'class': 'form-select'}),
+            'category': forms.Select(attrs={'class': 'form-select'}, choices=[('Flashcard', 'Flashcard')]),  # Default value only Flashcard
         }
+
+    def save(self, commit=True):
+        # Establecer el valor de 'category' por defecto antes de guardar
+        self.instance.category = 'Flashcard'
+        return super().save(commit)
