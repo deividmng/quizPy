@@ -5,6 +5,7 @@ from . import views
 urlpatterns = [
     path('', views.home, name='home'),
     path('python/', views.python_questions, name='python_questions'),
+    path('git/', views.git_questions, name='git_questions'),
     path('js/', views.js, name='js'),
     path('sql/', views.sql_questions, name='sql_questions'),  # 'sql/'
     path('question/<int:question_id>/', views.js, name='js_with_id'),

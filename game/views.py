@@ -242,6 +242,9 @@ def reset_score(request):
     request.session['incorrect_answers'] = []
     request.session['python_score'] = 0
     request.session['python_incorrect_answers'] = []
+    request.session['git_score'] = 0
+    request.session['git_incorrect_answers'] = []
+    request.session['total_selected_git_answers'] = 0 # I added total_selected for git cause It did't refres the number 
     request.session['sql_score'] = 0
     request.session['sql_incorrect_answers'] = []
     request.session['flashcard_score'] = 0
@@ -327,6 +330,63 @@ def python_questions(request):
         'error_message': error_message,
         'total_selected_python_answers': total_selected_answers,  # Pasar el total de respuestas seleccionadas
     })
+
+
+def git_questions(request):
+    git_projects = Project.objects.filter(category='Git').order_by('id')
+    current_question_index = int(request.POST.get('current_question_index', 0))
+    selected_answer = request.POST.get(f'answer_{request.POST.get("question_id")}', None)
+    is_correct = None
+    error_message = None
+
+    # To avoid the error
+    if 'git_incorrect_answers' not in request.session:
+        request.session['git_incorrect_answers'] = []
+
+    total_selected_answers = request.session.get('total_selected_git_answers', 0)
+
+    if request.method == "POST":
+        question_id = request.POST.get('question_id')
+        project = Project.objects.get(id=question_id)
+        selected_answer = request.POST.get(f'answer_{project.id}')
+
+        if selected_answer:
+            total_selected_answers += 1
+            request.session['total_selected_git_answers'] = total_selected_answers
+
+            if selected_answer == project.correct_answer:
+                request.session['git_score'] = request.session.get('git_score', 0) + 1
+                is_correct = True
+            else:
+                request.session['git_incorrect_answers'].append({
+                    'question': project.question,
+                    'your_answer': selected_answer or "No answer selected",
+                    'correct_answer': project.correct_answer
+                })
+                request.session.modified = True
+
+            current_question_index += 1
+        else:
+            error_message = "You must select an answer."
+
+    if current_question_index >= len(git_projects):
+        return render(request, 'result.html', {
+            'score': request.session.get('git_score', 0),
+            'incorrect_answers': request.session.get('git_incorrect_answers', []),
+            'total_selected_git_answers': total_selected_answers
+        })
+
+    current_project = git_projects[current_question_index]
+
+    return render(request, 'git_questions.html', {
+        'project': current_project,
+        'selected_answer': selected_answer,
+        'is_correct': is_correct,
+        'current_question_index': current_question_index,
+        'error_message': error_message,
+        'total_selected_git_answers': total_selected_answers
+    })
+
 
 def sql_questions(request):
     sql_projects = Project.objects.filter(category='SQL').order_by('id')
