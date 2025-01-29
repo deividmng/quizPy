@@ -16,9 +16,10 @@ def flashcard_form(request):
     if request.method == 'POST':
         form = FlashcardForm(request.POST)
         if form.is_valid():
-            # Guarda el formulario en la base de datos
-            form.save()
-            return redirect('flashcard_list')  # Asegúrate de que esta URL sea correcta
+            flashcard = form.save(commit=False)  # No guarda aún
+            flashcard.user = request.user  # Asocia el usuario a la flashcard
+            flashcard.save()  # Guarda la flashcard con el usuario asociado
+            return redirect('flashcard_list')  # Redirige a la lista de flashcards
     else:
         form = FlashcardForm()
 
@@ -27,7 +28,7 @@ def flashcard_form(request):
 @login_required
 def flashcard_list(request):
     # Obtener todas las preguntas de la categoría 'Flashcard'
-    flashcards = Project.objects.filter(category='Flashcard').order_by('id')
+    flashcards = Project.objects.filter(user=request.user)
     # Índice de la pregunta actual
     current_question_index = int(request.POST.get('current_question_index', 0))
 
@@ -91,6 +92,9 @@ def flashcard_list(request):
         'error_message': error_message,
         'total_selected_answers': total_selected_answers,  # Pasar el total de respuestas seleccionadas
     })
+
+
+
 
 
 
@@ -422,9 +426,9 @@ def update_flashcard(request, pk):
         flashcard.save()
         
         # Redirigir a la vista de detalles de la flashcard
-        return redirect('home', pk=flashcard.pk)
+        return redirect('flashcard_list',)
 
-    return render(request, 'home', {'flashcard': flashcard})
+    return render(request, 'flashcard_list', {'flashcard': flashcard})
 
 @login_required
 def delete_flashcard(request, pk):
