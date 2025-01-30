@@ -31,8 +31,3 @@ function getCookie(name) {
     return cookieValue;
 }
 
-// Ejemplo de cómo llamar a sendScore cuando termine una partida
-document.getElementById("saveScoreBtn").addEventListener("click", function() {
-    let points = document.getElementById("score").innerText; // Obtiene la puntuación del HTML
-    sendScore(points);
-});

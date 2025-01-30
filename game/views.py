@@ -1,21 +1,13 @@
-from django.http import HttpResponse ,JsonResponse
-from django.shortcuts import render,redirect
-from .models import Project
-from django.contrib.auth.forms import UserCreationForm ,AuthenticationForm
-from django.contrib.auth import login ,logout, authenticate
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
 from django.db import IntegrityError
+from django.contrib.auth.decorators import login_required
+from .models import Project, Score
 from .forms import FlashcardForm
-from django.shortcuts import render, redirect
-from django.shortcuts import render, get_object_or_404
-from django.contrib.auth.decorators import login_required
 
-
-
-
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from .models import Score
 
 @login_required  # Asegura que el usuario esté autenticado
 def save_score(request):
@@ -28,9 +20,6 @@ def save_score(request):
 
 
 
-from django.shortcuts import render
-from django.contrib.auth.models import User
-from .models import Score
 
 def leaderboard(request):
     # Obtiene todos los usuarios
@@ -557,48 +546,45 @@ def delete_flashcard(request, pk):
 
 
 
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from .models import Score, Project
 
 
-from django.shortcuts import render, redirect
-from .models import Project, Score
-
-
-def update_score(request):
-    # Obtener el puntaje actual de la sesión
-    current_score = request.session.get('randon_score', 0)
+# def update_score(request):
+#     # Obtener el puntaje actual de la sesión
+#     current_score = request.session.get('randon_score', 0)
     
-    # Si el usuario está autenticado, actualiza la puntuación acumulada
-    if request.user.is_authenticated:
-        # Recupera el objeto de puntuación (o crea uno si no existe)
-        score, created = Score.objects.get_or_create(user=request.user)
+#     # Si el usuario está autenticado, actualiza la puntuación acumulada
+#     if request.user.is_authenticated:
+#         # Recupera el objeto de puntuación (o crea uno si no existe)
+#         score, created = Score.objects.get_or_create(user=request.user)
         
-        # Si es un nuevo puntaje, lo inicializa en 0
-        if not created:
-            # Suma la puntuación actual con la acumulada
-            score.points += current_score
-        else:
-            # Si es un nuevo puntaje, asigna el puntaje actual
-            score.points = current_score
+#         # Si es un nuevo puntaje, lo inicializa en 0
+#         if not created:
+#             # Suma la puntuación actual con la acumulada
+#             score.points += current_score
+#         else:
+#             # Si es un nuevo puntaje, asigna el puntaje actual
+#             score.points = current_score
         
-        # Guarda los cambios
-        score.save()
+#         # Guarda los cambios
+#         score.save()
+        
 
-    # Opcional: puedes redirigir al leaderboard o cualquier otra página después de actualizar
-    return redirect('leaderboard')
-
+#     # Opcional: puedes redirigir al leaderboard o cualquier otra página después de actualizar
+#     return redirect('leaderboard')
 @login_required
 def randon_questions(request):
     randon_questions_projects = Project.objects.filter(category='Randon').order_by('id')
+    
+    # Verifica si es una nueva partida (no se ha enviado POST aún)
+    if request.method == "GET":
+        request.session['randon_score'] = 0
+        request.session['randon_incorrect_answers'] = []
+        request.session['total_selected_randon_answers'] = 0
+
     current_question_index = int(request.POST.get('current_question_index', 0))
     selected_answer = request.POST.get(f'answer_{request.POST.get("question_id")}', None)
     is_correct = None
     error_message = None
-
-    if 'randon_incorrect_answers' not in request.session:
-        request.session['randon_incorrect_answers'] = []
 
     total_selected_answers = request.session.get('total_selected_randon_answers', 0)
 
@@ -628,19 +614,16 @@ def randon_questions(request):
 
     # Si terminan las preguntas, guarda la puntuación en la base de datos
     if current_question_index >= len(randon_questions_projects):
-        # Asegúrate de que el puntaje se acumule
         user_score = request.session.get('randon_score', 0)
 
-        # Actualiza la puntuación del usuario
         if request.user.is_authenticated:
             score, created = Score.objects.get_or_create(user=request.user)
             if not created:
-                score.points += user_score  # Sumar los puntos
+                score.points += user_score
             else:
-                score.points = user_score  # Asignar puntaje si es el primer juego
+                score.points = user_score
             score.save()
 
-        # Redirige a la tabla de clasificación
         return redirect('home')
 
     current_project = randon_questions_projects[current_question_index]
