@@ -8,6 +8,7 @@ class Project(models.Model):
         ('Python', 'Python'),
         ('SQL', 'SQL'),
         ('Git', 'Git'),
+        ('Randon', 'Randon'),
         
     ]
 
@@ -36,3 +37,15 @@ class Project(models.Model):
 
     def __str__(self):
         return f"[{self.category}] {self.question}"
+
+
+from django.db import models
+from django.contrib.auth.models import User  # Importa el modelo de usuario de Django
+
+class Score(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # Relación con el usuario
+    points = models.IntegerField(default=0)  # Puntos obtenidos por el usuario
+    created_at = models.DateTimeField(auto_now_add=True)  # Fecha de creación de la puntuación
+
+    def __str__(self):
+        return f"{self.user.username} - {self.points} puntos"
