@@ -11,6 +11,47 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 
 
+
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Score
+
+@login_required  # Asegura que el usuario esté autenticado
+def save_score(request):
+    if request.method == "POST":
+        new_points = int(request.POST.get("points", 0))  # Recoge los puntos desde el formulario
+        score, created = Score.objects.get_or_create(user=request.user)
+        score.points += new_points  # Suma los puntos
+        score.save()
+    return redirect("leaderboard")  # Redirige a la tabla de clasificación
+
+
+
+from django.shortcuts import render
+from django.contrib.auth.models import User
+from .models import Score
+
+def leaderboard(request):
+    # Obtiene todos los usuarios
+    users = User.objects.all()
+
+    # Crea una lista con usuarios y sus puntuaciones (si existen)
+    leaderboard_data = []
+    for user in users:
+        score = Score.objects.filter(user=user).first()  # Obtiene la puntuación del usuario si existe
+        leaderboard_data.append({
+            "username": user.username,
+            "points": score.points if score else 0  # Si no tiene puntuación, muestra 0
+        })
+
+    # Ordenar por puntos (descendente)
+    leaderboard_data.sort(key=lambda x: x["points"], reverse=True)
+
+    return render(request, "leaderboard.html", {"leaderboard_data": leaderboard_data})
+
+
+
 @login_required
 def flashcard_form(request):
     if request.method == 'POST':
@@ -458,9 +499,6 @@ def sql_questions(request):
         'total_selected_sql_answers': total_selected_answers,  # Pasar el total de respuestas seleccionadas
     })
 
-
-
-
 #* update and delete 
 
 @login_required
@@ -499,3 +537,80 @@ def delete_flashcard(request, pk):
         return redirect('flashcard_list')  # Redirige a la lista de flashcards después de eliminar
 
     return render(request, 'delete_flashcard.html', {'flashcard': flashcard})
+
+
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Score, Project
+
+
+from django.shortcuts import render, redirect
+from .models import Project, Score
+
+def randon_questions(request):
+    # Obtener preguntas de la categoría 'Randon'
+    randon_projects = Project.objects.filter(category='Randon').order_by('id')
+    current_question_index = int(request.POST.get('current_question_index', 0))
+    selected_answer = request.POST.get(f'answer_{request.POST.get("question_id")}', None)
+    is_correct = None
+    error_message = None
+
+    # Inicializar listas en sesión si no existen
+    if 'randon_incorrect_answers' not in request.session:
+        request.session['randon_incorrect_answers'] = []
+
+    total_selected_answers = request.session.get('total_selected_randon_answers', 0)
+
+    if request.method == "POST":
+        question_id = request.POST.get('question_id')
+        project = Project.objects.get(id=question_id)
+        selected_answer = request.POST.get(f'answer_{project.id}')
+
+        if selected_answer:
+            total_selected_answers += 1
+            request.session['total_selected_randon_answers'] = total_selected_answers
+
+            if selected_answer == project.correct_answer:
+                request.session['randon_score'] = request.session.get('randon_score', 0) + 1
+                is_correct = True
+            else:
+                request.session['randon_incorrect_answers'].append({
+                    'question': project.question,
+                    'your_answer': selected_answer or "No answer selected",
+                    'correct_answer': project.correct_answer
+                })
+                request.session.modified = True
+
+            current_question_index += 1
+        else:
+            error_message = "You must select an answer."
+
+    # Si terminan las preguntas, guardar la puntuación en la base de datos
+    if current_question_index >= len(randon_projects):
+        user_score = request.session.get('randon_score', 0)
+
+        if request.user.is_authenticated:
+            # Guardar en la base de datos (o actualizar si ya existe)
+            score, created = Score.objects.get_or_create(user=request.user)
+            if user_score > score.points:  # Guardar solo si la nueva puntuación es mayor
+                score.points = user_score
+                score.save()
+
+        # Limpiar la sesión para un nuevo intento
+        request.session.pop('randon_score', None)
+        request.session.pop('randon_incorrect_answers', None)
+        request.session.pop('total_selected_randon_answers', None)
+
+        return redirect('leaderboard')  # Redirige a la tabla de clasificación
+
+    current_project = randon_projects[current_question_index]
+
+    return render(request, 'randon_questions.html', {
+        'project': current_project,
+        'selected_answer': selected_answer,
+        'is_correct': is_correct,
+        'current_question_index': current_question_index,
+        'error_message': error_message,
+        'total_selected_randon_answers': total_selected_answers
+    })

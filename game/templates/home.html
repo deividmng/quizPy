@@ -14,6 +14,12 @@
         <a href="js/" class="btn btn-primary btn-lg">
             Start Quiz
         </a>
+        <a href="randon/" class="btn btn-primary btn-lg">
+            Start randon
+        </a>
+        <a href="leaderboard/" class="btn btn-primary btn-lg">
+            See the rankinnn
+        </a>
         {% if user.is_authenticated %}
         <li class="nav-item">
             <a class="nav-link" href="/flashcard_form/">Create Flash Card</a>
@@ -24,4 +30,7 @@
         {% endif %}
     </div>
 </div>
+
+
+
 {% endblock %}
