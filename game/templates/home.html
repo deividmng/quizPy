@@ -3,34 +3,58 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<div class="text-center mt-5">
+<div class="container text-center mt-5">
     <h1 class="display-4 js-color">Welcome to Flashcards App</h1>
-    <p class="fs-5 text-secondary">
+    <p class="fs-5 text-secondary mb-4">
         Boost your knowledge with our interactive flashcards. Choose a category and start learning!
     </p>
 
-    <!-- Botón para empezar -->
-    <div class="mt-4">
-        <a href="js/" class="btn btn-primary btn-lg">
-            Start Quiz
-        </a>
-        <a href="randon/" class="btn btn-primary btn-lg">
-            Start randon
-        </a>
+    <!-- Botones para empezar -->
+    <div class="d-flex justify-content-center gap-3 mb-4">
         <a href="leaderboard/" class="btn btn-primary btn-lg">
-            See the rankinnn
+            See the ranking
         </a>
         {% if user.is_authenticated %}
-        <li class="nav-item">
-            <a class="nav-link" href="/flashcard_form/">Create Flash Card</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="/flashcard_list/">Flash List</a>
-        </li>
+        <a href="randon/" class="btn-randon">
+            Start randon
+        </a>
         {% endif %}
     </div>
+
+    {% if user.is_authenticated %}
+    <div class="mt-4">
+        <h3>Welcome, {{ user.username }}!</h3>
+        <div class="d-flex justify-content-center gap-3">
+            <a class="btn btn-warning btn-lg" href="/flashcard_form/">Create Flash Card</a>
+            <a class="btn btn-info btn-lg" href="/flashcard_list/">Flash List</a>
+        </div>
+    </div>
+    {% endif %}
 </div>
 
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Tabla de Clasificación</h2>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Posición</th>
+                    <th>Usuario</th>
+                    <th>Puntos</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in leaderboard_data|slice:":5" %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ entry.username }}</td>
+                    <td>{{ entry.points }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 
 
 {% endblock %}
