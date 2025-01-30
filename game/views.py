@@ -197,7 +197,24 @@ def singout(request):
 
 
 def home(request):
-    return render(request, 'home.html')
+    # Obtener la lista de puntuaciones de todos los usuarios
+    users = User.objects.all()
+    leaderboard_data = []
+
+    for user in users:
+        score = Score.objects.filter(user=user).first()
+        leaderboard_data.append({
+            "username": user.username,
+            "points": score.points if score else 0
+        })
+
+    # Ordenar la lista por puntos de forma descendente
+    leaderboard_data.sort(key=lambda x: x["points"], reverse=True)
+
+    # Pasar los datos del leaderboard a la plantilla
+    return render(request, 'home.html', {
+        'leaderboard_data': leaderboard_data
+    })
 
 def js(request):
     # Obtener todas las preguntas ordenadas por 'id'
@@ -548,15 +565,38 @@ from .models import Score, Project
 from django.shortcuts import render, redirect
 from .models import Project, Score
 
+
+def update_score(request):
+    # Obtener el puntaje actual de la sesión
+    current_score = request.session.get('randon_score', 0)
+    
+    # Si el usuario está autenticado, actualiza la puntuación acumulada
+    if request.user.is_authenticated:
+        # Recupera el objeto de puntuación (o crea uno si no existe)
+        score, created = Score.objects.get_or_create(user=request.user)
+        
+        # Si es un nuevo puntaje, lo inicializa en 0
+        if not created:
+            # Suma la puntuación actual con la acumulada
+            score.points += current_score
+        else:
+            # Si es un nuevo puntaje, asigna el puntaje actual
+            score.points = current_score
+        
+        # Guarda los cambios
+        score.save()
+
+    # Opcional: puedes redirigir al leaderboard o cualquier otra página después de actualizar
+    return redirect('leaderboard')
+
+@login_required
 def randon_questions(request):
-    # Obtener preguntas de la categoría 'Randon'
-    randon_projects = Project.objects.filter(category='Randon').order_by('id')
+    randon_questions_projects = Project.objects.filter(category='Randon').order_by('id')
     current_question_index = int(request.POST.get('current_question_index', 0))
     selected_answer = request.POST.get(f'answer_{request.POST.get("question_id")}', None)
     is_correct = None
     error_message = None
 
-    # Inicializar listas en sesión si no existen
     if 'randon_incorrect_answers' not in request.session:
         request.session['randon_incorrect_answers'] = []
 
@@ -586,25 +626,24 @@ def randon_questions(request):
         else:
             error_message = "You must select an answer."
 
-    # Si terminan las preguntas, guardar la puntuación en la base de datos
-    if current_question_index >= len(randon_projects):
+    # Si terminan las preguntas, guarda la puntuación en la base de datos
+    if current_question_index >= len(randon_questions_projects):
+        # Asegúrate de que el puntaje se acumule
         user_score = request.session.get('randon_score', 0)
 
+        # Actualiza la puntuación del usuario
         if request.user.is_authenticated:
-            # Guardar en la base de datos (o actualizar si ya existe)
             score, created = Score.objects.get_or_create(user=request.user)
-            if user_score > score.points:  # Guardar solo si la nueva puntuación es mayor
-                score.points = user_score
-                score.save()
+            if not created:
+                score.points += user_score  # Sumar los puntos
+            else:
+                score.points = user_score  # Asignar puntaje si es el primer juego
+            score.save()
 
-        # Limpiar la sesión para un nuevo intento
-        request.session.pop('randon_score', None)
-        request.session.pop('randon_incorrect_answers', None)
-        request.session.pop('total_selected_randon_answers', None)
+        # Redirige a la tabla de clasificación
+        return redirect('home')
 
-        return redirect('leaderboard')  # Redirige a la tabla de clasificación
-
-    current_project = randon_projects[current_question_index]
+    current_project = randon_questions_projects[current_question_index]
 
     return render(request, 'randon_questions.html', {
         'project': current_project,

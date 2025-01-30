@@ -1,0 +1,39 @@
+/* Estilo para la tabla con scroll lateral */
+.table-responsive {
+    max-height: 500px;
+    overflow-y: auto;
+    overflow-x: auto;
+}
+
+/* El encabezado de la tabla (thead) debe ser sticky */
+.table thead {
+    position: sticky;
+    top: 0; /* Fija el encabezado en la parte superior */
+    z-index: 1; /* Asegura que el encabezado esté por encima del contenido */
+    background-color: #007bff; /* Fondo azul */
+    color: white; /* Color del texto */
+}
+
+/* Estilos para las celdas de la tabla */
+.table th, .table td {
+    white-space: nowrap;
+    padding: 10px;
+    text-align: center;
+}
+
+h2 {
+    color: #333;
+    font-weight: bold;
+}
+
+/* Estilo para la tabla en general */
+table {
+    width: 100%; /* Asegura que la tabla ocupe todo el ancho del contenedor */
+    margin-top: 20px;
+}
+
+/* Opcional: Estilo para filas de la tabla */
+.table-striped tbody tr:nth-child(odd) {
+    background-color: #f2f2f2;
+}
+
