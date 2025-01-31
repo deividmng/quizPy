@@ -11,45 +11,54 @@
 <main class="container">
     <div class="row justify-content-center mt-5">
         <div class="col-md-6">
-            <form method="post" class="card shadow-lg p-4">
-                {% csrf_token %}
-                <h1 class="text-center mb-4">Signup</h1>
-                
-                <div class="mb-3">
-                    <label for="username" class="form-label">Username:</label>
-                    <input 
-                        type="text" 
-                        name="username" 
-                        id="username" 
-                        class="form-control" 
-                        placeholder="Write your username" 
-                        required>
-                </div>
+            <div class="wrapper">
+                <form method="post" class="form-login">
+                    {% csrf_token %}
+                    <h1 class="form-login">Sign Up</h1>
+                    
+                    <div class="input-box">
+                        <input 
+                            type="text" 
+                            name="username" 
+                            id="username" 
+                            class="form-control" 
+                            placeholder="Write your username" 
+                            required>
+                    </div>
 
-                <div class="mb-3">
-                    <label for="password1" class="form-label">Password:</label>
-                    <input 
-                        type="password" 
-                        name="password1" 
-                        id="password1" 
-                        class="form-control" 
-                        placeholder="Write your password" 
-                        required>
-                </div>
+                    <div class="input-box">
+                        <input 
+                            type="password" 
+                            name="password1" 
+                            id="password1" 
+                            class="form-control" 
+                            placeholder="Write your password" 
+                            required>
+                    </div>
 
-                <div class="mb-3">
-                    <label for="password2" class="form-label">Confirm Password:</label>
-                    <input 
-                        type="password" 
-                        name="password2" 
-                        id="password2" 
-                        class="form-control" 
-                        placeholder="Confirm your password" 
-                        required>
-                </div>
-                
-                <button type="submit" class="btn btn-primary w-100">SignUp</button>
-            </form>
+                    <div class="input-box">
+                        <input 
+                            type="password" 
+                            name="password2" 
+                            id="password2" 
+                            class="form-control" 
+                            placeholder="Confirm your password" 
+                            required>
+                    </div>
+
+                    <div class="remember-forgot">
+                        <label>
+                            <input type="checkbox" name="terms"> I agree to the terms and conditions
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn">Sign Up</button>
+
+                    <div class="register-link">
+                        <p>Already have an account? <a href="/signin/">Sign In</a></p>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </main>

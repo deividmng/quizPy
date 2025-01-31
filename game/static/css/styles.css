@@ -1,42 +1,222 @@
 @import url("./table.css");
 
-.btn-randon {
-    display: inline-block;
-    padding: 0.9rem 1.8rem;
-    font-size: 16px;
-    font-weight: 700;
-    color: green;
-    border: 3px solid green;
-    cursor: pointer;
-    position: relative;
-    background-color: transparent;
-    text-decoration: none;
-    overflow: hidden;
-    z-index: 1;
-    font-family: inherit;
-    transition: all 0.3s ease;
+.navbar a.active {
+  border-bottom: 2px solid white;
 }
 
-.btn-randon::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgb(252, 70, 100);
-    transform: translateX(-100%);
-    transition: all 0.3s;
-    z-index: -1;
+.btn-randon2 {
+  background: #fbca1f;
+  font-family: inherit;
+  padding: 0.6em 1.3em;
+  font-weight: 900;
+  font-size: 18px;
+  border: 3px solid black;
+  border-radius: 0.4em;
+  box-shadow: 0.1em 0.1em;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+  color: black;
+  transition: background 0.6s, color 0.3s, transform 0.1s, box-shadow 0.1s;
 }
 
-.btn-randon:hover::before {
-    transform: translateX(0);
+.btn-randon2:hover {
+  background: #e6b800;  /* Un tono más oscuro de amarillo */
+  color: white;  /* Cambia el color del texto */
+  transform: translate(-0.05em, -0.05em);
+  box-shadow: 0.15em 0.15em;
 }
 
-.btn-randon:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    border-color: gray;
-    color: gray;
+.btn-randon2:active {
+  transform: translate(0.05em, 0.05em);
+  box-shadow: 0.05em 0.05em;
+}
+
+
+
+/* text on the quiestions */
+.inline-welcome {
+  display: flex;
+  justify-content: center; 
+  align-items: center; 
+  gap: 10px; 
+  font-size: 24px;
+  text-align: center;
+}
+
+.inline-welcome h1,
+.inline-welcome h3 {
+  margin: 0; 
+  display: inline;
+}
+
+
+
+
+
+
+
+/* Contenedor que agrupa las preguntas */
+.question-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Dos columnas */
+  gap: 20px; /* Espacio entre las preguntas */
+  justify-items: center; /* Centra las preguntas */
+  margin-top: 20px;
+}
+
+/* Asegura que cada pregunta ocupe un espacio adecuado */
+.question {
+  width: 100%; /* Asegura que las preguntas tengan un tamaño apropiado */
+  max-width: 250px; /* Limita el tamaño máximo */
+}
+
+/* Estilos para las opciones de respuesta */
+.answer-option {
+  background-color: white;
+  border: 2px solid #007bff;
+  color: #007bff;
+  padding: 0.6em 1.3em;
+  font-weight: 900;
+  font-size: 18px;
+  text-align: center;
+  display: inline-block;
+  transition: background-color 0.3s, color 0.3s;
+  cursor: pointer;
+  border-radius: 0.4em;
+  width: 100%;
+}
+
+/* Cambiar el color de fondo cuando el radio button está seleccionado */
+input[type="radio"]:checked + label {
+  background-color: #007bff;
+  color: white;
+}
+
+/* Cambiar el color de fondo y texto cuando el ratón pasa sobre el botón */
+.answer-option:hover {
+  background-color: #0056b3;
+  color: white;
+}
+
+/* Cambiar el color cuando el botón está activo (clickeado) */
+.answer-option:active {
+  background-color: #004085;
+  color: white;
+}
+
+/* Estilo para los botones de envío */
+.submit-btn {
+  background-color: #28a745;
+  color: white;
+  padding: 1em 2em;
+  font-weight: 900;
+  font-size: 18px;
+  border: 3px solid #28a745;
+  border-radius: 0.4em;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  display: block;
+  margin: 20px auto;
+}
+
+.submit-btn:hover {
+  background-color: #218838;
+}
+
+.submit-btn:active {
+  background-color: #1e7e34;
+}
+
+
+
+/* formulario */
+
+
+.wrapper {
+  width: 420px;
+  background: rgb(2, 0, 36);
+  background: linear-gradient(
+    90deg,
+    rgba(2, 0, 36, 1) 9%,
+    rgba(9, 9, 121, 1) 68%,
+    rgba(0, 91, 255, 1) 97%
+  );
+  backdrop-filter: blur(9px);
+  color: #fff;
+  border-radius: 12px;
+  padding: 30px 40px;
+}
+.form-login {
+  font-size: 36px;
+  text-align: center;
+}
+.wrapper .input-box {
+  position: relative;
+  width: 100%;
+  height: 50px;
+
+  margin: 30px 0;
+}
+.input-box input {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 40px;
+  font-size: 16px;
+  color: #fff;
+  padding: 20px 45px 20px 20px;
+}
+.input-box input::placeholder {
+  color: #fff;
+}
+
+.wrapper .remember-forgot {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14.5px;
+  margin: -15px 0 15px;
+}
+.remember-forgot label input {
+  accent-color: #fff;
+  margin-right: 3px;
+}
+.remember-forgot a {
+  color: #fff;
+  text-decoration: none;
+}
+.remember-forgot a:hover {
+  text-decoration: underline;
+}
+.wrapper .btn {
+  width: 150px;
+  height: 45px;
+  background: #fff;
+  border: none;
+  outline: none;
+  border-radius: 40px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  font-size: 16px;
+  color: #333;
+  font-weight: 600;
+  margin-left: 90px;
+  margin-top: 10px;
+}
+.wrapper .register-link {
+  font-size: 14.5px;
+  text-align: center;
+  margin: 20px 0 15px;
+}
+.register-link p a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+}
+.register-link p a:hover {
+  text-decoration: underline;
 }
