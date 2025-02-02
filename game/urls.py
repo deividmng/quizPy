@@ -8,7 +8,6 @@ urlpatterns = [
     path('python/', views.python_questions, name='python_questions'),
     path('randon/', views.randon_questions, name='randon_questions'),
     path("save_score/", views.save_score, name="save_score"),
-    path("leaderboard/", views.leaderboard, name="leaderboard"),
     path('git/', views.git_questions, name='git_questions'),
     path('js/', views.js, name='js'),
     path('sql/', views.sql_questions, name='sql_questions'),  # 'sql/'
