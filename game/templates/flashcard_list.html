@@ -7,11 +7,8 @@
             <h2 class="text-center text-primary">Flashcards</h2>
             <!-- Display the current question -->
             <p class="fs-5">{{ flashcard.question }}</p>
-            <p>Total de respuestas seleccionadas: {{ total_selected_answers }}</p>
+            <!-- <p>Total de respuestas seleccionadas: {{ total_selected_answers }}</p> -->
 
-            <a href="{% url 'flashcard_details' pk=flashcard.pk %}" class="btn btn-primary">
-                Ver Detalles
-            </a>
             {% for flashcard in flashcards %}
     <div class="flashcard">
         <p>{{ flashcard.question }}</p>
@@ -43,7 +40,7 @@
                         {{ flashcard.choice_1 }}
                     </label>
                 </div>
-                <div class="form-check">
+                <!-- <div class="form-check">
                     <input
                         class="form-check-input"
                         type="radio"
@@ -78,7 +75,7 @@
                     <label class="form-check-label" for="choice4">
                         {{ flashcard.choice_4 }}
                     </label>
-                </div>
+                </div> -->
 
                 {% if error_message %}
                 <div class="alert alert-danger" role="alert">
@@ -89,8 +86,13 @@
                 <!-- Submit button -->
                 <div class="text-center mt-4">
                     <button type="submit" class="btn btn-success btn-lg">
-                        Submit Answer
+                        Next One 
                     </button>
+                </div>
+                <div class="flashcard">
+                    
+                    <!-- Enlace estilizado como botón para acceder a los detalles -->
+                    <a href="{% url 'flashcard_details' pk=flashcard.pk %}" class="btn btn-primary">Ver Detalles</a>
                 </div>
             </form>
         </div>

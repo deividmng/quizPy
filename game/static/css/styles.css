@@ -1,6 +1,11 @@
 @import url("./table.css");
 @import url("./form.css");
 
+
+.hidden-field {
+  display: none;
+}
+
 .navbar a.active {
   border-bottom: 2px solid white;
 }

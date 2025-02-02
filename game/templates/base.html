@@ -33,7 +33,7 @@
                     <li class="nav-item">
                         <a class="nav-link prueba" href="/">Home</a>
                     </li>
-                    <li class="nav-item">
+                    <!-- <li class="nav-item">
                         <a class="nav-link" href="/js/">JavaScript</a>
                     </li>
                     <li class="nav-item">
@@ -44,13 +44,32 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/git/">Git</a>
-                    </li>
+                    </li> -->
                     {% if user.is_authenticated %}
                    
                     <li class="nav-item">
                         <a class="nav-link text-danger" href="/logout">Logout</a>
                     </li>
-                   
+
+                    <div class="dropdown">
+                        <button class="btn btn-randon2 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Flash Card
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/flashcard_form/">Crear Flashcard</a></li>
+                            <li><a class="dropdown-item" href="/flashcard_list/">Ver Flash List</a></li>
+                        </ul>
+                    </div>
+                    
+                      
+                    <div class="dropdown">
+                        <button class="btn btn-randon2 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Ranking
+                        </button>
+                        <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="leaderboard/">See the ranking</a></li>
+                        </ul>
+                    </div>
                     {% else %}
                     
                     <!-- <li class="nav-item">

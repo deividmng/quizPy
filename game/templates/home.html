@@ -18,13 +18,25 @@
     </p>
 
     <div class="d-flex justify-content-center gap-3 mb-4">
-        <a href="leaderboard/" class="btn-randon2">
+        <!-- <a href="leaderboard/" class="btn-randon2">
             See the ranking
-        </a>
+        </a> -->
+        <li class="btn-randon2">
+            <a class="nav-link" href="/js/">JavaScript</a>
+        </li>
+        <li class="btn-randon2">
+            <a class="nav-link" href="/python/">Python</a>
+        </li>
+        <li class="btn-randon2">
+            <a class="nav-link" href="/sql/">Sql</a>
+        </li>
+        <li class="btn-randon2">
+            <a class="nav-link" href="/git/">Git</a>
+        </li>
         {% if user.is_authenticated %}
        
         <a href="randon/" class="btn-randon2">
-            Start randon
+            Take the test
         </a>
         
         {% endif %}
@@ -33,16 +45,16 @@
 
 
     {% if user.is_authenticated %}
-    <div class="mt-4">
+    <!-- <div class="mt-4">
         <div class="d-flex justify-content-center gap-3">
             <a class="btn-randon2" href="/flashcard_form/">Create Flash Card</a>
             <a class="btn-randon2" href="/flashcard_list/">Flash List</a>
         </div>
-    </div>
+    </div> -->
     {% endif %}
 </div>
 
-<div class="container mt-5">
+<!-- <div class="container mt-5">
     <h2 class="text-center mb-4">Ranking Top 5 </h2>
     <div class="table-responsive">
         <table class="table table-striped">
@@ -64,7 +76,7 @@
             </tbody>
         </table>
     </div>
-</div>
+</div> -->
 
 
 {% endblock %}

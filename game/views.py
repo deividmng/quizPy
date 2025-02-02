@@ -7,6 +7,11 @@ from django.db import IntegrityError
 from django.contrib.auth.decorators import login_required
 from .models import Project, Score
 from .forms import FlashcardForm
+from django.shortcuts import render, get_object_or_404, redirect
+
+
+
+
 
 
 @login_required  # Asegura que el usuario esté autenticado
@@ -65,7 +70,6 @@ def flashcard_list(request):
     # Variables iniciales
     selected_answer = None
     is_correct = None
-    error_message = None
 
     # Contar las respuestas seleccionadas
     total_selected_answers = request.session.get('total_selected_answers', 0)
@@ -97,18 +101,14 @@ def flashcard_list(request):
                 })
                 request.session.modified = True
 
-            # Avanzar al siguiente índice
-            current_question_index += 1
-        else:
-            # Generar un mensaje de error si no se selecciona ninguna respuesta
-            error_message = "You must select an answer."
+        # Avanzar al siguiente índice sin importar si se seleccionó una respuesta o no
+        current_question_index += 1
 
-    # Si se han terminado las preguntas, redirigir a la página de resultados
+    # Si ya no hay más preguntas, mostrar un mensaje de que no hay más preguntas creadas
     if current_question_index >= len(flashcards):
-        return render(request, 'result.html', {
-            'score': request.session.get('flashcard_score', 0),
-            'incorrect_answers': request.session.get('flashcard_incorrect_answers', []),
-            'total_selected_answers': total_selected_answers  # Pasar el total de respuestas seleccionadas
+        return render(request, 'no_more_questions.html', { 
+            'message': "No more questions available.",
+            'total_selected_answers': total_selected_answers
         })
 
     # Pregunta actual
@@ -119,11 +119,8 @@ def flashcard_list(request):
         'current_question_index': current_question_index,
         'selected_answer': selected_answer,
         'is_correct': is_correct,
-        'error_message': error_message,
-        'total_selected_answers': total_selected_answers,  # Pasar el total de respuestas seleccionadas
+        'total_selected_answers': total_selected_answers,
     })
-
-
 
 
 
@@ -513,24 +510,26 @@ def flashcard_details(request, pk):
     return render(request, 'flashcard_details.html', {'flashcard': flashcard})
 
 
+
+
 @login_required
 def update_flashcard(request, pk):
     flashcard = get_object_or_404(Project, pk=pk)
 
     if request.method == 'POST':
-        # getting the value from the form
-        flashcard.question = request.POST['question']
-        flashcard.choice_1 = request.POST['choice_1']
-        flashcard.choice_2 = request.POST['choice_2']
-        flashcard.choice_3 = request.POST['choice_3']
-        flashcard.choice_4 = request.POST['choice_4']
-        flashcard.correct_answer = request.POST['correct_answer']
-        
-        # Saving the new date 
+        # Obtener valores del formulario
+        flashcard.question = request.POST.get('question', flashcard.question)
+        flashcard.choice_1 = request.POST.get('choice_1', flashcard.choice_1)
+        flashcard.choice_2 = request.POST.get('choice_2', flashcard.choice_2)  # Si no está en el formulario, mantiene el valor anterior
+        flashcard.choice_3 = request.POST.get('choice_3', flashcard.choice_3)
+        flashcard.choice_4 = request.POST.get('choice_4', flashcard.choice_4)
+        flashcard.correct_answer = request.POST.get('correct_answer', flashcard.correct_answer)
+
+        # Guardar los cambios
         flashcard.save()
         
-        # Redirigir a la vista de detalles de la flashcard
-        return redirect('flashcard_list',)
+        # Redirigir a la lista de flashcards
+        return redirect('flashcard_list')
 
     return render(request, 'flashcard_list', {'flashcard': flashcard})
 
