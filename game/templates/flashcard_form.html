@@ -14,7 +14,7 @@
                     {{ form.question }}
                 </div>
                 <div class="mb-3">
-                    <label for="id_choice_1" class="form-label">Choice 1</label>
+                    <label for="id_choice_1" class="form-label">Correct Answer</label>
                     {{ form.choice_1 }}
                
                 <div class="mb-3  d-none">
@@ -29,7 +29,7 @@
                     <label for="id_choice_4" class="form-label">Choice 4</label>
                     {{ form.choice_4 }}
                 </div>
-                <div class="mb-3">
+                <div class="mb-3 d-none">
                     <label for="id_correct_answer" class="form-label">Correct Answer</label>
                     {{ form.correct_answer }}
                 </div>
@@ -58,4 +58,17 @@
         </div>
     </div>
 </div>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const choice1 = document.getElementById("id_choice_1");
+        const correctAnswer = document.getElementById("id_correct_answer");
+
+        choice1.addEventListener("input", function () {
+            correctAnswer.value = choice1.value;
+        });
+    });
+</script>
+
 {% endblock %}
