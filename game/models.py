@@ -5,10 +5,13 @@ class Project(models.Model):
     CATEGORY_CHOICES = [
         ('Flashcard', 'Flashcard'),
         ('JavaScript', 'JavaScript'),
-        
+        ('JavaScriptL_2', 'JavaScript_2'),
         ('Python', 'Python'),
+        ('PythonL_2', 'PythonL_2'),
         ('SQL', 'SQL'),
+        ('SQL_level_2', 'SQL_level_2'),
         ('Git', 'Git'),
+        ('Git_level_2', 'Git_level_2'),
         ('Randon', 'Randon'),
         
     ]

@@ -23,9 +23,6 @@ def save_score(request):
         score.save()
     return redirect("leaderboard")  # Redirige a la tabla de clasificación
 
-
-
-
 def leaderboard(request):
     # Obtiene todos los usuarios
     users = User.objects.all()
@@ -269,6 +266,13 @@ def js(request):
         })
 
     current_project = projects[current_question_index]
+
+    # Definir el nivel dinámicamente
+    level = "JavaScript Level 1"
+    
+    # Calcular las preguntas restantes
+    remaining_questions = len(projects) - current_question_index - 1
+
     return render(request, 'project_list.html', {
         'project': current_project,
         'selected_answer': selected_answer,
@@ -276,7 +280,10 @@ def js(request):
         'current_question_index': current_question_index,
         'error_message': error_message,  # Pasar el mensaje de error al template
         'total_selected_js_answers': total_selected_answers,  # Pasar el total de respuestas seleccionadas
+        'level': level,  # Pasar el nivel al template
+        'remaining_questions': remaining_questions,  # Pasar el número de preguntas restantes
     })
+
 
 # Esta función restablecerá el puntaje y las respuestas incorrectas
 
@@ -297,6 +304,10 @@ def reset_score(request):
     request.session['total_selected_python_answers'] = 0
     request.session['total_selected_sql_answers'] = 0
     request.session['total_selected_js_answers'] = 0
+    request.session['total_selected_js_level_2_answers'] = 0
+    request.session['total_selected_pythonL2_answers'] = 0
+    request.session['pythonL2_score'] = 0
+    request.session['pythonL2_incorrect_answers'] = []
     
     #Geting the URL to redirect after the game is done 
     next_url = request.POST.get('next_url', 'home')  #, 'home' in case it dont foun it it will send it at home 
@@ -307,15 +318,23 @@ def reset_score(request):
 #! it scras with the url that I save <why??
 def try_later(request):
      # Reset score and incorrect answers, 
+    # Reset score and incorrect answers, 
     request.session['score'] = 0
     request.session['incorrect_answers'] = []
     request.session['python_score'] = 0
     request.session['python_incorrect_answers'] = []
-    request.session['sql_score'] = 0
-    request.session['sql_incorrect_answers'] = []
     request.session['git_score'] = 0
     request.session['git_incorrect_answers'] = []
+    request.session['total_selected_git_answers'] = 0 # I added total_selected for git cause It did't refres the number 
+    request.session['sql_score'] = 0
+    request.session['sql_incorrect_answers'] = []
+    request.session['flashcard_score'] = 0
+    request.session['flashcard_incorrect_answers'] = []
+    request.session['total_selected_answers'] = 0
+    request.session['total_selected_python_answers'] = 0
+    request.session['total_selected_sql_answers'] = 0
     request.session['total_selected_js_answers'] = 0
+    request.session['total_selected_js_level_2_answers'] = 0
     return redirect('home')
 
 
@@ -550,7 +569,7 @@ def delete_flashcard(request, pk):
 @login_required
 def randon_questions(request):
     randon_questions_projects = Project.objects.filter(category='Randon').order_by('id')
-    
+
     # Verifica si es una nueva partida (no se ha enviado POST aún)
     if request.method == "GET":
         request.session['randon_score'] = 0
@@ -563,6 +582,12 @@ def randon_questions(request):
     error_message = None
 
     total_selected_answers = request.session.get('total_selected_randon_answers', 0)
+
+    # Inicializar variables de sesión si no existen
+    if 'randon_score' not in request.session:
+        request.session['randon_score'] = 0
+    if 'randon_incorrect_answers' not in request.session:
+        request.session['randon_incorrect_answers'] = []
 
     if request.method == "POST":
         question_id = request.POST.get('question_id')
@@ -588,6 +613,9 @@ def randon_questions(request):
         else:
             error_message = "You must select an answer."
 
+    # Calcular cuántas preguntas quedan
+    remaining_questions = len(randon_questions_projects) - current_question_index
+
     # Si terminan las preguntas, guarda la puntuación en la base de datos
     if current_question_index >= len(randon_questions_projects):
         user_score = request.session.get('randon_score', 0)
@@ -602,6 +630,7 @@ def randon_questions(request):
 
         return redirect('leaderboard')
 
+    # Pregunta actual
     current_project = randon_questions_projects[current_question_index]
 
     return render(request, 'randon_questions.html', {
@@ -610,5 +639,318 @@ def randon_questions(request):
         'is_correct': is_correct,
         'current_question_index': current_question_index,
         'error_message': error_message,
-        'total_selected_randon_answers': total_selected_answers
+        'total_selected_randon_answers': total_selected_answers,
+        'remaining_questions': remaining_questions,  # Pasar las preguntas restantes
+        'level': "Randon Level"  # Pasar el nivel al template
+    })
+
+
+def js_level_2(request):
+    # Obtener todas las preguntas ordenadas por 'id'
+    projects = Project.objects.filter(category='JavaScriptL_2').order_by('id')
+    selected_answer = None
+    is_correct = None
+    error_message = None  # Variable para el mensaje de error
+    current_question_index = int(request.POST.get('current_question_index', 0))
+
+    # Inicializar la sesión
+    if 'score' not in request.session:
+        request.session['score'] = 0
+    if 'incorrect_answers' not in request.session:
+        request.session['incorrect_answers'] = []
+    if 'total_selected_js_answers' not in request.session:
+        request.session['total_selected_js_answers'] = 0  # Inicializar el contador
+
+    total_selected_answers = request.session['total_selected_js_answers']  # Obtener el contador actual
+
+    if request.method == "POST":
+        question_id = request.POST.get('question_id')
+        project = Project.objects.get(id=question_id)
+        selected_answer = request.POST.get(f'answer_{project.id}')
+
+        if selected_answer:
+            # Incrementar el contador de respuestas seleccionadas
+            total_selected_answers += 1
+            request.session['total_selected_js_answers'] = total_selected_answers  # Guardar el contador en la sesión
+
+            # Verificar si la respuesta es correcta
+            is_correct = (selected_answer == project.correct_answer)
+            if is_correct:
+                request.session['score'] += 1
+            else:
+                # Respuesta incorrecta
+                incorrect_answer = {
+                    'question': project.question,
+                    'your_answer': selected_answer,
+                    'correct_answer': project.correct_answer,
+                }
+                incorrect_answers = request.session['incorrect_answers']
+                incorrect_answers.append(incorrect_answer)
+                request.session['incorrect_answers'] = incorrect_answers
+                request.session.modified = True
+        else:
+            # Manejar el caso donde no se seleccionó una respuesta
+            error_message = "You must select an answer."
+            incorrect_answer = {
+                'question': project.question,
+                'your_answer': "No answer selected",
+                'correct_answer': project.correct_answer,
+            }
+            incorrect_answers = request.session['incorrect_answers']
+            incorrect_answers.append(incorrect_answer)
+            request.session['incorrect_answers'] = incorrect_answers
+            request.session.modified = True
+
+        current_question_index += 1
+
+    # Verificar si el índice actual supera el total de preguntas
+    if current_question_index >= len(projects):
+        return render(request, 'result.html', {
+            'score': request.session['score'],
+            'incorrect_answers': request.session['incorrect_answers'],
+            'total_selected_js_answers': total_selected_answers  # Pasar el total de respuestas seleccionadas
+        })
+
+    current_project = projects[current_question_index]
+
+    # Calcular las preguntas restantes
+    remaining_questions = len(projects) - current_question_index - 1
+
+    # Definir el nivel dinámicamente
+    level = "JavaScript Level 2"
+
+    return render(request, 'project_list.html', {
+        'project': current_project,
+        'selected_answer': selected_answer,
+        'is_correct': is_correct,
+        'current_question_index': current_question_index,
+        'error_message': error_message,  
+        'total_selected_js_answers': total_selected_answers, 
+        'level': level,  
+        'remaining_questions': remaining_questions  
+    })
+
+
+
+def python_level_2(request):
+    python_projects = Project.objects.filter(category='PythonL_2').order_by('id')
+    current_question_index = int(request.POST.get('current_question_index', 0))
+    selected_answer = request.POST.get(f'answer_{request.POST.get("question_id")}', None)
+    is_correct = None
+    error_message = None
+
+    # Contar las respuestas seleccionadas
+    total_selected_answers = request.session.get('total_selected_pythonL2_answers', 0)
+
+    # Inicializar variables de sesión si no existen
+    if 'pythonL2_score' not in request.session:
+        request.session['pythonL2_score'] = 0
+    if 'pythonL2_incorrect_answers' not in request.session:
+        request.session['pythonL2_incorrect_answers'] = []
+
+    if request.method == "POST":
+        question_id = request.POST.get('question_id')
+        project = Project.objects.get(id=question_id)
+        selected_answer = request.POST.get(f'answer_{project.id}')
+
+        if selected_answer:
+            # Incrementar el contador de respuestas seleccionadas
+            total_selected_answers += 1
+            request.session['total_selected_pythonL2_answers'] = total_selected_answers
+
+            # Validar si la respuesta es correcta
+            if selected_answer == project.correct_answer:
+                request.session['pythonL2_score'] += 1
+                is_correct = True
+            else:
+                error_message = None
+                request.session['pythonL2_incorrect_answers'].append({
+                    'question': project.question,
+                    'your_answer': selected_answer or "No answer selected",
+                    'correct_answer': project.correct_answer
+                })
+                request.session.modified = True
+
+            # Avanzar al siguiente índice
+            current_question_index += 1
+        else:
+            # Si no se selecciona una respuesta, mostrar un mensaje de error y no avanzar
+            error_message = "You must select an answer."
+
+    # Calcular cuántas preguntas quedan
+    remaining_questions = len(python_projects) - current_question_index
+
+    # Si se han terminado las preguntas, redirigir a la página de resultados
+    if current_question_index >= len(python_projects):
+        return render(request, 'result.html', {
+            'score': request.session.get('pythonL2_score', 0),
+            'incorrect_answers': request.session.get('pythonL2_incorrect_answers', []),
+            'total_selected_pythonL2_answers': total_selected_answers
+        })
+
+    # Pregunta actual
+    current_project = python_projects[current_question_index]
+
+    return render(request, 'python_questions.html', {
+        'project': current_project,
+        'selected_answer': selected_answer,
+        'is_correct': is_correct,
+        'current_question_index': current_question_index,
+        'error_message': error_message,
+        'total_selected_pythonL2_answers': total_selected_answers,
+        'remaining_questions': remaining_questions,  # Pasar las preguntas restantes
+        'level': "Python Level 2"  # Pasar el nivel al template
+    })
+
+def sql_level_2(request):
+    sql_projects = Project.objects.filter(category='SQL_level_2').order_by('id')
+    selected_answer = None
+    is_correct = None
+    error_message = None  # Variable para mostrar un mensaje de error
+    current_question_index = int(request.POST.get('current_question_index', 0))
+
+    # Inicializar la sesión si no existe
+    if 'sql_score' not in request.session:
+        request.session['sql_score'] = 0
+    if 'sql_incorrect_answers' not in request.session:
+        request.session['sql_incorrect_answers'] = []
+    if 'total_selected_sql_answers' not in request.session:
+        request.session['total_selected_sql_answers'] = 0  # Contador de respuestas seleccionadas
+
+    total_selected_answers = request.session['total_selected_sql_answers']  # Obtener el contador actual
+
+    if request.method == "POST":
+        question_id = request.POST.get('question_id')
+        project = Project.objects.get(id=question_id)
+        selected_answer = request.POST.get(f'answer_{project.id}')
+
+        if selected_answer:
+            # Incrementar el contador de respuestas seleccionadas
+            total_selected_answers += 1
+            request.session['total_selected_sql_answers'] = total_selected_answers  # Guardar en la sesión
+
+            # Verificar si la respuesta es correcta
+            is_correct = (selected_answer == project.correct_answer)
+            if is_correct:
+                request.session['sql_score'] += 1
+            else:
+                # Respuesta incorrecta
+                incorrect_answer = {
+                    'question': project.question,
+                    'your_answer': selected_answer,
+                    'correct_answer': project.correct_answer,
+                }
+                incorrect_answers = request.session['sql_incorrect_answers']
+                incorrect_answers.append(incorrect_answer)
+                request.session['sql_incorrect_answers'] = incorrect_answers
+                request.session.modified = True
+
+            # Solo avanzar si se ha seleccionado una respuesta
+            current_question_index += 1
+        else:
+            # No permitir avanzar si no selecciona una respuesta
+            error_message = "You must select an answer."
+
+    # Verificar si se completaron todas las preguntas
+    if current_question_index >= len(sql_projects):
+        return render(request, 'result.html', {
+            'score': request.session['sql_score'],
+            'incorrect_answers': request.session['sql_incorrect_answers'],
+            'total_selected_sql_answers': total_selected_answers  # Pasar el total de respuestas seleccionadas
+        })
+
+    current_project = sql_projects[current_question_index]
+
+    # Calcular preguntas restantes
+    remaining_questions = len(sql_projects) - current_question_index - 1
+
+    # Definir el nivel
+    level = "SQL Level 2"
+
+    return render(request, 'sql_questions.html', {
+        'project': current_project,
+        'selected_answer': selected_answer,
+        'is_correct': is_correct,
+        'current_question_index': current_question_index,
+        'error_message': error_message,  
+        'total_selected_sql_answers': total_selected_answers,  # Pasar el total de respuestas seleccionadas
+        'level': level,  
+        'remaining_questions': remaining_questions  
+    })
+
+
+def git_level_2(request):
+    git_projects = Project.objects.filter(category='Git_level_2').order_by('id')
+    selected_answer = None
+    is_correct = None
+    error_message = None  # Variable para mostrar un mensaje de error
+    current_question_index = int(request.POST.get('current_question_index', 0))
+
+    # Inicializar la sesión si no existe
+    if 'git_score' not in request.session:
+        request.session['git_score'] = 0
+    if 'git_incorrect_answers' not in request.session:
+        request.session['git_incorrect_answers'] = []
+    if 'total_selected_git_answers' not in request.session:
+        request.session['total_selected_git_answers'] = 0  # Contador de respuestas seleccionadas
+
+    total_selected_answers = request.session['total_selected_git_answers']  # Obtener el contador actual
+
+    if request.method == "POST":
+        question_id = request.POST.get('question_id')
+        project = Project.objects.get(id=question_id)
+        selected_answer = request.POST.get(f'answer_{project.id}')
+
+        if selected_answer:
+            # Incrementar el contador de respuestas seleccionadas
+            total_selected_answers += 1
+            request.session['total_selected_git_answers'] = total_selected_answers  # Guardar en la sesión
+
+            # Verificar si la respuesta es correcta
+            is_correct = (selected_answer == project.correct_answer)
+            if is_correct:
+                request.session['git_score'] += 1
+            else:
+                # Respuesta incorrecta
+                incorrect_answer = {
+                    'question': project.question,
+                    'your_answer': selected_answer,
+                    'correct_answer': project.correct_answer,
+                }
+                incorrect_answers = request.session['git_incorrect_answers']
+                incorrect_answers.append(incorrect_answer)
+                request.session['git_incorrect_answers'] = incorrect_answers
+                request.session.modified = True
+
+            # Solo avanzar si se ha seleccionado una respuesta
+            current_question_index += 1
+        else:
+            # No permitir avanzar si no selecciona una respuesta
+            error_message = "You must select an answer."
+
+    # Verificar si se completaron todas las preguntas
+    if current_question_index >= len(git_projects):
+        return render(request, 'result.html', {
+            'score': request.session['git_score'],
+            'incorrect_answers': request.session['git_incorrect_answers'],
+            'total_selected_git_answers': total_selected_answers  # Pasar el total de respuestas seleccionadas
+        })
+
+    current_project = git_projects[current_question_index]
+
+    # Calcular preguntas restantes
+    remaining_questions = len(git_projects) - current_question_index - 1
+
+    # Definir el nivel
+    level = "Git Level 2"
+
+    return render(request, 'git_questions.html', {
+        'project': current_project,
+        'selected_answer': selected_answer,
+        'is_correct': is_correct,
+        'current_question_index': current_question_index,
+        'error_message': error_message,  
+        'total_selected_git_answers': total_selected_answers,  # Pasar el total de respuestas seleccionadas
+        'level': level,  
+        'remaining_questions': remaining_questions  
     })

@@ -5,7 +5,16 @@
 {% block content %}
 <div class="card shadow-lg">
     <div class="card-body">
-        <h1 class="text-center text-primary">SQL Questions</h1>
+        <div class="container">
+            <div class="row">
+                <div class="col-6 ">
+                    <p>{{ level }}</p>
+                </div>
+                <div class="col-6 text-end">
+                    <p><strong>{{ remaining_questions }}</strong></p>
+                </div>
+            </div>
+        </div>
         <!-- Display the question -->
         <p class="fs-5 text-center">{{ project.question }}</p>
 

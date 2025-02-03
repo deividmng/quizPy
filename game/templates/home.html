@@ -19,11 +19,52 @@
     <div class="d-flex flex-column align-items-center gap-3 mb-4 mt-5">
         <!-- Botones de categorías -->
         <div class="d-flex justify-content-center gap-3">
-            <button class="btn-randon2" onclick="location.href='/js/'">JavaScript</button>
-            <button class="btn-randon2" onclick="location.href='/python/'">Python</button>
-            <button class="btn-randon2" onclick="location.href='/sql/'">SQL</button>
-            <button class="btn-randon2" onclick="location.href='/git/'">Git</button>
+            <!-- Dropdown para JavaScript -->
+            <div class="dropdown">
+                <button class="btn-randon2 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    JavaScript
+                </button>
+                <ul class="dropdown-menu btn-randon2">
+                    <li><a class="dropdown-item text-center" href="/js/">Level 1</a></li>
+                    <li><a class="dropdown-item text-center" href="/js_level_2/">Level 2</a></li>
+                </ul>
+            </div>
+        
+            <!-- Botón para Python -->
+            <div class="dropdown">
+                <button class="btn-randon2 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Python
+                </button>
+                <ul class="dropdown-menu btn-randon2">
+                    <li><a class="dropdown-item text-center" href="/python/">Level 1</a></li>
+                    <li><a class="dropdown-item text-center" href="/python_level_2/">Level 2</a></li>
+                </ul>
+            </div>
+        
+            <!-- For SQL -->
+            <div class="dropdown">
+                <button class="btn-randon2 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    SQL
+                </button>
+                <ul class="dropdown-menu btn-randon2">
+                    <li><a class="dropdown-item text-center" href="/sql/">Level 1</a></li>
+                    <li><a class="dropdown-item text-center" href="/sql_level_2/">Level 2</a></li>
+                </ul>
+            </div>
+        
+            <!-- For Git -->
+            <div class="dropdown">
+                <button class="btn-randon2 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Git
+                </button>
+                <ul class="dropdown-menu btn-randon2">
+                    <li><a class="dropdown-item text-center" href="/git/">Level 1</a></li>
+                    <li><a class="dropdown-item text-center" href="/git_level_2/">Level 2</a></li>
+                </ul>
+            </div>
         </div>
+        
+        
 
         {% if not user.is_authenticated %}
             <h2 class="mt-5 ">Sign in to save your progress and start the test!</h2>
