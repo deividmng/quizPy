@@ -1,101 +1,71 @@
-{% extends 'base.html' %}
-
-{% block content %}
+{% extends 'base.html' %} {% block content %}
 <div class="container mt-5">
-    <div class="card shadow-lg">
-        <div class="card-body">
-            <h2 class="text-center text-primary">Flashcards</h2>
-            <!-- Display the current question -->
-            <p class="fs-5">{{ flashcard.question }}</p>
-            <!-- <p>Total de respuestas seleccionadas: {{ total_selected_answers }}</p> -->
+  <div class=" shadow-lg">
+    <div class="">
+      <!-- Display the current question -->
+      <h1 class="fs-10 text-center">{{ flashcard.question }}</h1>
+    
+      {% for flashcard in flashcards %}
+      <div class="flashcard">
+        <h1>{{ flashcard.question }}</h1> >
+      </div>
+      {% endfor %}
 
-            {% for flashcard in flashcards %}
-    <div class="flashcard">
-        <p>{{ flashcard.question }}</p>
-        <!-- Enlace estilizado como botón para acceder a los detalles -->
-        <a href="{% url 'flashcard_details' pk=flashcard.pk %}" class="btn btn-primary">Ver Detalles</a>
-    </div>
-{% endfor %}
 
-            <!-- Form -->
-            <form method="POST" class="mt-4">
-                {% csrf_token %}
-                <input type="hidden" name="question_id" value="{{ flashcard.id }}" />
+      
+
+      <!-- Form -->
+      <form method="POST" class="mt-4">
+        {% csrf_token %}
+        <input type="hidden" name="question_id" value="{{ flashcard.id }}" />
+        <input
+          type="hidden"
+          name="current_question_index"
+          value="{{ current_question_index }}"
+        />
+
+        <!-- Answer options with Bootstrap styling -->
+        <div class="container mt-5">
+            <div class="d-flex justify-content-center align-items-center flex-column">
+              <!-- Card List -->
+              <div class="cardList" data-answer="{{ flashcard.answer }}">
                 <input
-                    type="hidden"
-                    name="current_question_index"
-                    value="{{ current_question_index }}"
+                  class="form-check-input"
+                  type="radio"
+                  name="answer_{{ flashcard.id }}"
+                  id="choice1"
+                  value="{{ flashcard.choice_1 }}"
+                  style="display: none;"
                 />
-
-                <!-- Answer options with Bootstrap styling -->
-                <div class="form-check">
-                    <input
-                        class="form-check-input"
-                        type="radio"
-                        name="answer_{{ flashcard.id }}"
-                        id="choice1"
-                        value="{{ flashcard.choice_1 }}"
-                    />
-                    <label class="form-check-label" for="choice1">
-                        {{ flashcard.choice_1 }}
-                    </label>
-                </div>
-                <!-- <div class="form-check">
-                    <input
-                        class="form-check-input"
-                        type="radio"
-                        name="answer_{{ flashcard.id }}"
-                        id="choice2"
-                        value="{{ flashcard.choice_2 }}"
-                    />
-                    <label class="form-check-label" for="choice2">
-                        {{ flashcard.choice_2 }}
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input
-                        class="form-check-input"
-                        type="radio"
-                        name="answer_{{ flashcard.id }}"
-                        id="choice3"
-                        value="{{ flashcard.choice_3 }}"
-                    />
-                    <label class="form-check-label" for="choice3">
-                        {{ flashcard.choice_3 }}
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input
-                        class="form-check-input"
-                        type="radio"
-                        name="answer_{{ flashcard.id }}"
-                        id="choice4"
-                        value="{{ flashcard.choice_4 }}"
-                    />
-                    <label class="form-check-label" for="choice4">
-                        {{ flashcard.choice_4 }}
-                    </label>
-                </div> -->
-
-                {% if error_message %}
-                <div class="alert alert-danger" role="alert">
-                    {{ error_message }}
-                </div>
-                {% endif %}
-
-                <!-- Submit button -->
-                <div class="text-center mt-4">
-                    <button type="submit" class="btn btn-success btn-lg">
-                        Next One 
-                    </button>
-                </div>
-                <div class="flashcard">
-                    
-                    <!-- Enlace estilizado como botón para acceder a los detalles -->
-                    <a href="{% url 'flashcard_details' pk=flashcard.pk %}" class="btn btn-primary">Ver Detalles</a>
-                </div>
-            </form>
-        </div>
+                <label for="choice1" class="custom-radio-label">
+                  {{ flashcard.choice_1 }}
+                </label>
+              </div>
+          
+              <!-- Error Message -->
+              {% if error_message %}
+              <div class="alert alert-danger mt-3" role="alert">{{ error_message }}</div>
+              {% endif %}
+          
+              <!-- Submit Button -->
+              <div class="text-center mt-4">
+                <button type="submit" class="btn btn-success btn-lg">Next </button>
+              </div>
+          
+              <!-- Flashcard Details Link -->
+              <div class="flashcard mt-3 mb-4">
+                <a href="{% url 'flashcard_details' pk=flashcard.pk %}" class="btn btn-primary">
+                    Edit
+                </a>
+              </div>
+            </div>
+          </div>
+      </form>
     </div>
+  </div>
 </div>
+
+
 {% endblock %}
+
+

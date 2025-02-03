@@ -6,14 +6,13 @@
 <div class="container mt-5">
     <div class="card shadow-lg">
         <div class="card-body">
-            <h1 class="text-center text-primary">SQL Questions</h1>
+            
             <!-- Display the question -->
-            <p class="fs-5">{{ project.question }}</p>
-
-            <!-- Form -->
+            <h1 class="fs-7 text-center">{{ project.question }}</h1>
+    
             <form method="POST" class="mt-4">
                 {% csrf_token %}
-
+                <div class="question-container">
                 <input type="hidden" name="question_id" value="{{ project.id }}" />
                 <input
                     type="hidden"
@@ -22,60 +21,62 @@
                 />
 
                 <!-- Answer options with Bootstrap styling -->
-                <div class="form-check">
+                <div class="form-check ">
                     <input
-                        class="form-check-input"
+                        class="d-none"
                         type="radio"
                         name="answer_{{ project.id }}"
                         id="choice1"
                         value="{{ project.choice_1 }}"
                     />
-                    <label class="form-check-label" for="choice1">
+                    <label class=" answer-option" for="choice1">
                         {{ project.choice_1 }}
                     </label>
                 </div>
                 <div class="form-check">
                     <input
-                        class="form-check-input"
+                        class="d-none"
                         type="radio"
                         name="answer_{{ project.id }}"
                         id="choice2"
                         value="{{ project.choice_2 }}"
                     />
-                    <label class="form-check-label" for="choice2">
+                    <label class=" answer-option" for="choice2">
                         {{ project.choice_2 }}
                     </label>
                 </div>
                 <div class="form-check">
                     <input
-                        class="form-check-input"
+                        class="d-none"
                         type="radio"
                         name="answer_{{ project.id }}"
                         id="choice3"
                         value="{{ project.choice_3 }}"
                     />
-                    <label class="form-check-label" for="choice3">
+                    <label class=" answer-option" for="choice3">
                         {{ project.choice_3 }}
                     </label>
                 </div>
-                <div class="form-check">
+                <div class="form-check ">
                     <input
-                        class="form-check-input"
+                        class="d-none"
                         type="radio"
                         name="answer_{{ project.id }}"
                         id="choice4"
                         value="{{ project.choice_4 }}"
                     />
-                    <label class="form-check-label" for="choice4">
+                    <label class=" answer-option" for="choice4">
                         {{ project.choice_4 }}
                     </label>
                 </div>
-
+            </div>
+           
                 {% if error_message %}
-                <div class="alert alert-danger" role="alert">
+                <div class="alert alert-danger text-center mt-3" role="alert">
                     {{ error_message }}
                 </div>
                 {% endif %}
+            
 
                 <!-- Submit button -->
                 <div class="text-center mt-4">

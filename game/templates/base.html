@@ -33,23 +33,10 @@
                     <li class="nav-item">
                         <a class="nav-link prueba" href="/">Home</a>
                     </li>
-                    <!-- <li class="nav-item">
-                        <a class="nav-link" href="/js/">JavaScript</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/python/">Python</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/sql/">Sql</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/git/">Git</a>
-                    </li> -->
+                    
                     {% if user.is_authenticated %}
                    
-                    <li class="nav-item">
-                        <a class="nav-link text-danger" href="/logout">Logout</a>
-                    </li>
+                   
 
                     <div class="dropdown">
                         <button class="btn btn-randon2 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -61,6 +48,7 @@
                         </ul>
                     </div>
                     
+                    
                       
                     <div class="dropdown">
                         <button class="btn btn-randon2 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -70,6 +58,10 @@
                         <li><a class="dropdown-item" href="leaderboard/">See the ranking</a></li>
                         </ul>
                     </div>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link text-danger" href="/logout">Logout</a>
+                    </li>
                     {% else %}
                     
                     <!-- <li class="nav-item">

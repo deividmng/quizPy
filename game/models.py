@@ -5,6 +5,7 @@ class Project(models.Model):
     CATEGORY_CHOICES = [
         ('Flashcard', 'Flashcard'),
         ('JavaScript', 'JavaScript'),
+        
         ('Python', 'Python'),
         ('SQL', 'SQL'),
         ('Git', 'Git'),
@@ -38,9 +39,6 @@ class Project(models.Model):
     def __str__(self):
         return f"[{self.category}] {self.question}"
 
-
-from django.db import models
-from django.contrib.auth.models import User  # Importa el modelo de usuario de Django
 
 class Score(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)  # Relación con el usuario
