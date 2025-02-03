@@ -5,9 +5,25 @@
 {% block content %}
 <div class="card shadow-lg">
     <div class="card-body">
-        <h1 class="text-center ">JavaScript Questions</h1>
-        <p class="fs-5 text-center">{{ project.question }}</p>
+      
+        <div class="container">
+            <div class="row">
+                <div class="col-6 ">
+                    <p>{{ level }}</p>
+                </div>
+                <div class="col-6 text-end">
+                    <p><strong>{{ remaining_questions }}</strong></p>
+                </div>
+            </div>
+        </div>
+        
+        
+        
+        <h1 class="fs-5 text-center">{{ project.question }}</h1>
     
+        <!-- Mostrar el número de preguntas restantes -->
+       
+        
         <form method="POST" class="mt-4">
             {% csrf_token %}
             <div class="question-container">
