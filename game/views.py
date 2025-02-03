@@ -661,7 +661,7 @@ def randon_questions(request):
         'error_message': error_message,
         'total_selected_randon_answers': total_selected_answers,
         'remaining_questions': remaining_questions,  # Pasar las preguntas restantes
-        'level': "Randon Level"  # Pasar el nivel al template
+        'level': "Random Level"  # Pasar el nivel al template
     })
 
 
