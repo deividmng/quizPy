@@ -51,7 +51,7 @@
 
                 
                 <div class="text-center">
-                    <button type="submit" class="btn btn-success w-100">Update Flashcard</button>
+                    <button type="submit" class="btn btn-success w-100">Update </button>
                 </div>
             </form>
         </div>
@@ -59,7 +59,7 @@
             <!-- Botón para eliminar -->
             <form action="{% url 'delete_flashcard' pk=flashcard.pk %}" method="post" id="delete-form" class="d-inline-block">
                 {% csrf_token %}
-                <button type="button" class="btn btn-danger mt-3" id="delete-button">Delete Flashcard</button>
+                <button type="button" class="btn btn-danger mt-3" id="delete-button">Delete</button>
             </form>
         </div>
     </div>

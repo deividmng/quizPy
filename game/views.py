@@ -313,6 +313,9 @@ def try_later(request):
     request.session['python_incorrect_answers'] = []
     request.session['sql_score'] = 0
     request.session['sql_incorrect_answers'] = []
+    request.session['git_score'] = 0
+    request.session['git_incorrect_answers'] = []
+    request.session['total_selected_js_answers'] = 0
     return redirect('home')
 
 
@@ -544,32 +547,6 @@ def delete_flashcard(request, pk):
     return render(request, 'delete_flashcard.html', {'flashcard': flashcard})
 
 
-
-
-
-# def update_score(request):
-#     # Obtener el puntaje actual de la sesión
-#     current_score = request.session.get('randon_score', 0)
-    
-#     # Si el usuario está autenticado, actualiza la puntuación acumulada
-#     if request.user.is_authenticated:
-#         # Recupera el objeto de puntuación (o crea uno si no existe)
-#         score, created = Score.objects.get_or_create(user=request.user)
-        
-#         # Si es un nuevo puntaje, lo inicializa en 0
-#         if not created:
-#             # Suma la puntuación actual con la acumulada
-#             score.points += current_score
-#         else:
-#             # Si es un nuevo puntaje, asigna el puntaje actual
-#             score.points = current_score
-        
-#         # Guarda los cambios
-#         score.save()
-        
-
-#     # Opcional: puedes redirigir al leaderboard o cualquier otra página después de actualizar
-#     return redirect('leaderboard')
 @login_required
 def randon_questions(request):
     randon_questions_projects = Project.objects.filter(category='Randon').order_by('id')
@@ -623,7 +600,7 @@ def randon_questions(request):
                 score.points = user_score
             score.save()
 
-        return redirect('home')
+        return redirect('leaderboard')
 
     current_project = randon_questions_projects[current_question_index]
 
