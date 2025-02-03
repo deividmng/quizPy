@@ -387,7 +387,11 @@ def python_questions(request):
 
     # Pregunta actual
     current_project = python_projects[current_question_index]
-
+    
+    remaining_questions = len(python_projects) - current_question_index - 1
+    
+    level = "Python Level 1"
+        
     return render(request, 'python_questions.html', {
         'project': current_project,
         'selected_answer': selected_answer,
@@ -395,6 +399,9 @@ def python_questions(request):
         'current_question_index': current_question_index,
         'error_message': error_message,
         'total_selected_python_answers': total_selected_answers,  # Pasar el total de respuestas seleccionadas
+        'level': level, 
+        'remaining_questions': remaining_questions 
+        
     })
 
 
@@ -443,6 +450,10 @@ def git_questions(request):
         })
 
     current_project = git_projects[current_question_index]
+    
+    remaining_questions = len(git_projects) - current_question_index - 1
+   
+    level = "SQL Level 1"
 
     return render(request, 'git_questions.html', {
         'project': current_project,
@@ -450,7 +461,9 @@ def git_questions(request):
         'is_correct': is_correct,
         'current_question_index': current_question_index,
         'error_message': error_message,
-        'total_selected_git_answers': total_selected_answers
+        'total_selected_git_answers': total_selected_answers,
+        'remaining_questions': remaining_questions,
+        'level': level, 
     })
 
 
@@ -515,6 +528,10 @@ def sql_questions(request):
         })
 
     current_project = sql_projects[current_question_index]
+    
+    remaining_questions = len(sql_projects) - current_question_index - 1
+    
+    level = "SQL Level 1"
     return render(request, 'sql_questions.html', {
         'project': current_project,
         'selected_answer': selected_answer,
@@ -522,6 +539,9 @@ def sql_questions(request):
         'current_question_index': current_question_index,
         'error_message': error_message,
         'total_selected_sql_answers': total_selected_answers,  # Pasar el total de respuestas seleccionadas
+        'remaining_questions': remaining_questions,
+        'level': level, 
+        
     })
 
 #* update and delete 
@@ -791,6 +811,7 @@ def python_level_2(request):
     # Pregunta actual
     current_project = python_projects[current_question_index]
 
+    level = "Python Level 2"
     return render(request, 'python_questions.html', {
         'project': current_project,
         'selected_answer': selected_answer,
@@ -799,7 +820,7 @@ def python_level_2(request):
         'error_message': error_message,
         'total_selected_pythonL2_answers': total_selected_answers,
         'remaining_questions': remaining_questions,  # Pasar las preguntas restantes
-        'level': "Python Level 2"  # Pasar el nivel al template
+        'level': level  # Pasar el nivel al template
     })
 
 def sql_level_2(request):
