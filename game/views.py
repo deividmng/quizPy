@@ -590,7 +590,7 @@ def delete_flashcard(request, pk):
 def randon_questions(request):
     randon_questions_projects = Project.objects.filter(category='Randon').order_by('id')
 
-    # Verifica si es una nueva partida (no se ha enviado POST aún)
+    # Check if it is a new game (no POST has been sent yet)
     if request.method == "GET":
         request.session['randon_score'] = 0
         request.session['randon_incorrect_answers'] = []
@@ -603,7 +603,7 @@ def randon_questions(request):
 
     total_selected_answers = request.session.get('total_selected_randon_answers', 0)
 
-    # Inicializar variables de sesión si no existen
+    # Initialize session variables if they do not exist
     if 'randon_score' not in request.session:
         request.session['randon_score'] = 0
     if 'randon_incorrect_answers' not in request.session:
@@ -633,13 +633,14 @@ def randon_questions(request):
         else:
             error_message = "You must select an answer."
 
-    # Calcular cuántas preguntas quedan
+    # Calculate how many questions are left
     remaining_questions = len(randon_questions_projects) - current_question_index
 
-    # Si terminan las preguntas, guarda la puntuación en la base de datos
+    # If the questions are finished, show the results
     if current_question_index >= len(randon_questions_projects):
         user_score = request.session.get('randon_score', 0)
 
+        # Save the score to the database (if the user is authenticated)
         if request.user.is_authenticated:
             score, created = Score.objects.get_or_create(user=request.user)
             if not created:
@@ -648,7 +649,13 @@ def randon_questions(request):
                 score.points = user_score
             score.save()
 
-        return redirect('leaderboard')
+        # Render the results template
+        return render(request, 'result.html', {
+            'score': user_score,
+            'incorrect_answers': request.session.get('randon_incorrect_answers', []),
+            'total_selected_randon_answers': total_selected_answers,
+            'level': "Random Level"  # Pasar el nivel al template
+        })
 
     # Pregunta actual
     current_project = randon_questions_projects[current_question_index]
@@ -660,8 +667,8 @@ def randon_questions(request):
         'current_question_index': current_question_index,
         'error_message': error_message,
         'total_selected_randon_answers': total_selected_answers,
-        'remaining_questions': remaining_questions,  # Pasar las preguntas restantes
-        'level': "Random Level"  # Pasar el nivel al template
+        'remaining_questions': remaining_questions,  
+        'level': "Random Level"  
     })
 
 
