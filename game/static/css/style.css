@@ -1,0 +1,197 @@
+/* From Uiverse.io by aadium */ 
+.card {
+  width: 250px;
+  height: 300px;
+  background: #15001f;
+  border: 1px solid #c042ff;
+  font-size: 14px;
+  font-family: monospace;
+  overflow: auto;
+}
+
+.titlebar {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-size: 21px;
+  font-weight: 450;
+  background-color: #2e0043;
+  width: 100%;
+  text-align: right;
+}
+
+.card button {
+  width: 40px;
+  height: 35px;
+  margin-left: -5px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  transition: 0.2s;
+}
+
+button svg path, 
+button svg rect, 
+button svg polygon {
+  fill: #ffffff;
+}
+
+button svg {
+  width: 10px;
+  height: 10px;
+}
+
+.close:hover {
+  background-color: #e81123;
+}
+
+.maximize:hover {
+  background-color: #c042ff2e;
+}
+
+.minimize:hover {
+  background-color: #c042ff2e;
+}
+
+#pre {
+  overflow: auto;
+  width: 100%;
+  padding: 10px;
+  height: auto;
+  color: #bafff8;
+}
+
+.curlies {
+  color: #ff0000;
+}
+
+.sc {
+  color: #e600ff;
+}
+
+.rounds {
+  color: #ffffff;
+}
+
+.operator {
+  color: #ffff00;
+}
+
+.s1 {
+  color: #22ff00;
+}
+
+.s2 {
+  color: #4281ff;
+}
+
+.s3 {
+  color: #ff4284;
+}
+
+.s4 {
+  color: #ffae00;
+}
+
+.s5 {
+  color: #ffffff;
+}
+
+.s6 {
+  color: #ffff00;
+}
+
+
+
+
+
+
+   body { background-color: #f8f9fa; margin: 0; }
+    .quiz-container { max-width: 850px; margin: 40px auto; font-family: 'Segoe UI', sans-serif; }
+
+    /* Badge superior */
+    .badge-int {
+        background-color: #c042ff;
+        color: white;
+        padding: 6px 16px;
+        border-radius: 8px;
+        font-weight: bold;
+    }
+
+    /* Diseño de Terminal */
+    .terminal-window {
+        background: #15001f;
+        border-radius: 10px;
+        overflow: hidden;
+        margin: 20px 0;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .terminal-header { background: #2e0043; padding: 12px; text-align: right; }
+    .t-btn { display: inline-block; width: 12px; height: 12px; border: 1.5px solid white; margin-left: 6px; border-radius: 2px; }
+
+    .terminal-body { padding: 30px; color: white; }
+    
+    /* Importante para respetar saltos de línea y colores */
+    .question-text, #pre code {
+        font-family: 'Consolas', 'Monaco', monospace;
+        white-space: pre-wrap; /* Mantiene el formato de la DB */
+        line-height: 1.5;
+        display: block;
+    }
+
+    /* Colores de sintaxis neón */
+    .s1 { color: #22ff00; } /* Strings y Comentarios */
+    .s2 { color: #42b6ff; } /* Funciones/Entrada-Salida */
+    .s3 { color: #ff4284; font-weight: bold; } /* Keywords */
+    .s4 { color: #ffae00; } /* Números y Tipos */
+    .s5 { color: #ffffff; } /* Texto base */
+
+    .code-box {
+        background: #000;
+        border: 1px solid #c042ff44;
+        padding: 15px;
+        border-radius: 5px;
+        margin-top: 15px;
+    }
+
+    /* Botón Execute */
+    .action-area { text-align: center; margin-bottom: 30px; }
+    .btn-execute {
+        background: white;
+        border: 2px solid #000;
+        padding: 10px 25px;
+        font-family: monospace;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    .btn-execute:hover { background: #000; color: #fff; }
+
+    /* Estilo de las opciones (Tarjetas con barra lateral) */
+    .options-wrapper { display: flex; flex-direction: column; gap: 15px; }
+    
+    .option-label {
+   
+        background: #222;
+        color: white;
+        cursor: pointer;
+        transition: 0.3s;
+        border-radius: 4px;
+        overflow: hidden;
+        height: 65px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    }
+
+    .option-bar {
+        width: 45px;
+        height: 100%;
+        background-color: #c042ff;
+        margin-right: 20px;
+        flex-shrink: 0;
+    }
+
+    .option-num { color: #22ff00; font-family: monospace; font-weight: bold; font-size: 1.2rem; margin-right: 15px; }
+    .option-text { font-size: 1.1rem; }
+
+    /* Selección: Cambia a azul como en tu imagen original */
+    input:checked + .option-label { background-color: #2b59c3; }
+    input:checked + .option-label .option-bar { background-color: #bafff8; }
