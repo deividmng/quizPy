@@ -13,6 +13,8 @@ class Project(models.Model):
         ('Git', 'Git'),
         ('Git_level_2', 'Git_level_2'),
         ('Randon', 'Randon'),
+        # 
+        ('Exercises_Int', 'Exercises_Int'), # Nueva categoría añadida
         
     ]
 

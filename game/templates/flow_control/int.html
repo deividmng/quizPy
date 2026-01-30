@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% load static %}
+{% load syntax_highlight %}
+
+{% block title %}Exercises - Int{% endblock %}
+
+{% block content %}
+<div class="quiz-container">
+    <div class="header-section">
+  
+    </div>
+
+    <div class="terminal-window">
+        <div class="terminal-body">
+            <div class="question-row">
+                <span class="s3"># QUESTION:</span> 
+                <span class="s5">{{ project.question|py_highlight }}</span>
+            </div>
+            
+            {% if project.code_snippet %}
+            <div class="code-box">
+                <pre><code>{{ project.code_snippet|py_highlight }}</code></pre>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="question_id" value="{{ project.id }}" />
+        <input type="hidden" name="current_question_index" value="{{ current_question_index }}" />
+
+        <div class="action-area">
+            <button type="submit" class="btn-execute">EXECUTE_RESPONSE()</button>
+        </div>
+
+        <div class="options-wrapper">
+            {% for i in "1234" %}
+            <div class="option-row">
+                <input class="d-none" type="radio" name="answer_{{ project.id }}" id="choice{{ i }}" 
+                    {% if i == "1" %} value="{{ project.choice_1 }}" 
+                    {% elif i == "2" %} value="{{ project.choice_2 }}" 
+                    {% elif i == "3" %} value="{{ project.choice_3 }}" 
+                    {% else %} value="{{ project.choice_4 }}" {% endif %} />
+                
+                <label class="option-label" for="choice{{ i }}">
+                    <span class="option-bar"></span>
+                    <span class="option-num">0{{ i }}.</span>
+                    <span class="option-text">
+                        {% if i == "1" %}{{ project.choice_1 }}
+                        {% elif i == "2" %}{{ project.choice_2 }}
+                        {% elif i == "3" %}{{ project.choice_3 }}
+                        {% else %}{{ project.choice_4 }}{% endif %}
+                    </span>
+                </label>
+            </div>
+            {% endfor %}
+        </div>
+    </form>
+</div>
+
+<style>
+    body { background-color: #f8f9fa; }
+    .quiz-container { max-width: 850px; margin: 40px auto; font-family: 'Segoe UI', sans-serif; }
+
+    /* Terminal */
+    .terminal-window {
+        background: #15001f;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    .terminal-header { background: #2e0043; padding: 10px; text-align: right; }
+    .t-btn { display: inline-block; width: 10px; height: 100%; border: 1px solid white; margin-left: 5px; height: 10px; }
+
+    .terminal-body { padding: 25px; color: white; font-family: 'Consolas', monospace; }
+
+    /* Alineación de la Pregunta */
+    .question-row {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        margin-bottom: 15px;
+    }
+    .s3 { color: #ff4284; font-weight: bold; white-space: nowrap; }
+    .s5 { color: #ffffff; line-height: 1.4; white-space: pre-wrap; }
+
+    /* Caja de Código */
+    .code-box {
+        background: #000;
+        border: 1px solid #c042ff55;
+        padding: 15px;
+        border-radius: 4px;
+    }
+    pre code { white-space: pre-wrap; display: block; }
+
+    /* Colores Sintaxis */
+    .s1 { color: #22ff00; } 
+    .s4 { color: #ffae00; }
+
+    /* Opciones */
+    .options-wrapper { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
+    .option-label {
+        display: flex;
+        align-items: center;
+        background: #1e1e1e;
+        color: white;
+        height: 60px;
+        cursor: pointer;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    .option-bar { width: 40px; height: 100%; background: #c042ff; margin-right: 15px; }
+    .option-num { color: #22ff00; font-weight: bold; margin-right: 10px; }
+
+    input:checked + .option-label { background: #2b59c3; }
+    input:checked + .option-label .option-bar { background: #bafff8; }
+
+    .btn-execute {
+        background: white; border: 2px solid black; padding: 10px 20px; 
+        font-family: monospace; font-weight: bold; cursor: pointer; margin: 20px 0;
+    }
+</style>
+{% endblock %}

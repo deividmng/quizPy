@@ -9,10 +9,77 @@ from .models import Project, Score
 from .forms import FlashcardForm
 from django.shortcuts import render, get_object_or_404, redirect
 
+# game/views.py
 
+def exercises_int_questions(request):
+    # 1. Filtramos específicamente por la nueva categoría que definiste en el modelo
+    int_projects = Project.objects.filter(category='Exercises_Int').order_by('id')
+    
+    current_question_index = int(request.POST.get('current_question_index', 0))
+    selected_answer = request.POST.get(f'answer_{request.POST.get("question_id")}', None)
+    is_correct = None
+    error_message = None
 
+    # Inicializar variables de sesión únicas para Exercises_Int (para no mezclarlas con Python)
+    if 'int_score' not in request.session:
+        request.session['int_score'] = 0
+    if 'int_incorrect_answers' not in request.session:
+        request.session['int_incorrect_answers'] = []
+    
+    total_selected_answers = request.session.get('total_selected_int_answers', 0)
 
+    if request.method == "POST":
+        question_id = request.POST.get('question_id')
+        project = Project.objects.get(id=question_id)
+        selected_answer = request.POST.get(f'answer_{project.id}')
 
+        if selected_answer:
+            total_selected_answers += 1
+            request.session['total_selected_int_answers'] = total_selected_answers
+
+            if selected_answer == project.correct_answer:
+                request.session['int_score'] += 1
+                is_correct = True
+            else:
+                request.session['int_incorrect_answers'].append({
+                    'question': project.question,
+                    'your_answer': selected_answer or "No answer selected",
+                    'correct_answer': project.correct_answer
+                })
+                request.session.modified = True
+
+            current_question_index += 1
+        else:
+            error_message = "You must select an answer."
+
+    # Redirigir a resultados si se terminan las preguntas
+    if current_question_index >= len(int_projects):
+        return render(request, 'result.html', {
+            'score': request.session.get('int_score', 0),
+            'incorrect_answers': request.session.get('int_incorrect_answers', []),
+            'total_selected_questions': total_selected_answers
+        })
+
+    # Obtener la pregunta actual basada en el índice
+    if int_projects.exists():
+        current_project = int_projects[current_question_index]
+    else:
+        # Por si aún no has creado preguntas en el Super User
+        return render(request, 'flow_control/int.html', {'error_message': 'No questions found in this category.'})
+    
+    remaining_questions = len(int_projects) - current_question_index - 1
+    level = "Intermediate Exercises"
+        
+    return render(request, 'flow_control/int.html', {
+        'project': current_project,
+        'selected_answer': selected_answer,
+        'is_correct': is_correct,
+        'current_question_index': current_question_index,
+        'error_message': error_message,
+        'total_selected_questions': total_selected_answers,
+        'level': level, 
+        'remaining_questions': remaining_questions 
+    })
 
 @login_required  # Asegura que el usuario esté autenticado
 def save_score(request):
